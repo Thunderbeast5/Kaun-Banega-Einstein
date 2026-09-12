@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FiSearch, FiFilter, FiEdit2, FiTrash2,
-  FiX, FiCheck, FiAlertCircle, FiLoader, FiUser,
+  FiX, FiCheck, FiAlertCircle, FiLoader,
 } from 'react-icons/fi';
 import {
   collection, doc, onSnapshot,
@@ -314,10 +314,10 @@ const ViewStudents = ({ schoolInfo }) => {
           <div className="relative z-10 p-2 sm:p-6">
 
             <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white shadow-sm">
-              <table className="w-full text-left border-collapse min-w-[750px]">
+                  <table className="w-full text-left border-collapse min-w-[650px]">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    {['Photo', 'App No.', 'Full Name', 'Class', 'Contact', 'Actions'].map((col) => (
+                    {['App No.', 'Full Name', 'Class', 'Contact', 'Actions'].map((col) => (
                       <th key={col} className="py-4 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">
                         {col}
                       </th>
@@ -328,21 +328,6 @@ const ViewStudents = ({ schoolInfo }) => {
                   {filtered.length > 0 ? (
                     filtered.map((student) => (
                       <tr key={student.id} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
-
-                        {/* Photo */}
-                        <td className="py-3 px-5">
-                          {student.photoUrl ? (
-                            <img
-                              src={student.photoUrl}
-                              alt={student.name}
-                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border-2 border-white shadow-sm">
-                              <FiUser className="w-4 h-4 text-blue-500" />
-                            </div>
-                          )}
-                        </td>
 
                         {/* Application number */}
                         <td className="py-3 px-5 font-mono font-bold text-blue-700 text-xs">
@@ -388,7 +373,7 @@ const ViewStudents = ({ schoolInfo }) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6" className="py-16 text-center text-slate-500 font-medium">
+                      <td colSpan="5" className="py-16 text-center text-slate-500 font-medium">
                         {students.length === 0
                           ? 'No students registered yet. Use "Register Students" to add your first student.'
                           : 'No students match your search.'}
