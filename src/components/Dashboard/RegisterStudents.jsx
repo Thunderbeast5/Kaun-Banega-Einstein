@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
 import {
-  FiPlus, FiDownload, FiUploadCloud,
+  FiPlus, FiDownload,
   FiFileText, FiImage, FiCheck, FiAlertCircle,
   FiLoader, FiX, FiClipboard,
 } from 'react-icons/fi';
+import { downloadBulkTemplate } from '../../lib/excel';
+import BulkUpload from './BulkUpload';
 import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '../../lib/firebase';
 import { uploadStudentPhoto, generateApplicationNumber } from '../../lib/cloudinary';
@@ -434,44 +436,24 @@ const RegisterStudents = ({ schoolInfo }) => {
                 <FiFileText className="w-6 h-6 text-blue-700" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Bulk Format Template</h3>
-              <p className="text-slate-700 text-sm font-medium mb-6">
-                Download the official Excel template. Fill in the student and parent details accurately before uploading.
+              <p className="text-slate-700 text-sm font-medium mb-2">
+                Download the official Excel template, fill in all student details (including photo filenames), then upload the Excel + all photos together.
               </p>
-              <button className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-white border border-slate-200 text-blue-700 font-bold hover:bg-blue-50 transition-colors shadow-sm">
+              <p className="text-xs text-slate-500 font-medium mb-6">
+                Photo column: enter the exact filename (e.g. <code className="bg-white/60 px-1 rounded">aarav.jpg</code>) so we can match it on upload.
+              </p>
+              <button
+                onClick={downloadBulkTemplate}
+                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-white border border-slate-200 text-blue-700 font-bold hover:bg-blue-50 transition-colors shadow-sm"
+              >
                 <FiDownload className="w-4 h-4" />
-                <span>Download .XLSX Format</span>
+                <span>Download .XLSX Template</span>
               </button>
             </div>
           </div>
 
-          {/* Upload Excel Card */}
-          <div className="relative rounded-[2rem] border border-white/60 shadow-sm bg-blue-400 overflow-hidden h-fit">
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
-            <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-blue-500/40 rounded-full -z-10" />
-
-            <div className="relative z-10 p-8 flex flex-col">
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Upload Roster</h3>
-              <p className="text-blue-900 text-sm font-medium mb-5">Upload your completed Excel format here.</p>
-
-              <label className="flex flex-col items-center justify-center py-6 border-2 border-white/60 border-dashed rounded-2xl cursor-pointer bg-white/30 hover:bg-white/50 transition-colors shadow-sm group">
-                <div className="flex flex-col items-center justify-center text-center px-4">
-                  <FiUploadCloud className="w-8 h-8 text-blue-700 mb-2 group-hover:-translate-y-1 transition-transform" />
-                  <p className="text-sm text-slate-900 font-bold mb-1">Drag &amp; Drop Excel File</p>
-                  <p className="text-xs text-blue-900 font-medium">.xlsx or .csv supported</p>
-                </div>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                />
-              </label>
-
-              <button className="flex items-center justify-center gap-2 w-full py-3 mt-4 rounded-full bg-blue-700 text-white font-bold hover:bg-blue-800 transition-colors shadow-md text-sm">
-                <FiUploadCloud className="w-4 h-4" />
-                <span>Process Upload</span>
-              </button>
-            </div>
-          </div>
+          {/* Bulk Upload state machine */}
+          <BulkUpload schoolInfo={schoolInfo} />
 
         </div>
       </div>
