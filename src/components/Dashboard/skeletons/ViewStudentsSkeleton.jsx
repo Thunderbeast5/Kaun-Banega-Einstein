@@ -23,7 +23,7 @@ const ViewStudentsSkeleton = () => (
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  {['Reg ID', 'Full Name', 'Grade', 'Contact', 'Status', 'Actions'].map((col) => (
+                  {['Photo', 'App No.', 'Full Name', 'Class', 'Contact', 'Actions'].map((col) => (
                     <th key={col} className="py-4 px-6">
                       <Skeleton width={70} height={12} borderRadius={4} />
                     </th>
@@ -33,14 +33,13 @@ const ViewStudentsSkeleton = () => (
               <tbody>
                 {[...Array(6)].map((_, i) => (
                   <tr key={i} className="border-b border-slate-50">
-                    <td className="py-4 px-6"><Skeleton width={75} height={16} borderRadius={6} /></td>
+                    <td className="py-4 px-6"><Skeleton width={40} height={40} borderRadius={50} /></td>
+                    <td className="py-4 px-6"><Skeleton width={100} height={16} borderRadius={6} /></td>
                     <td className="py-4 px-6"><Skeleton width={140} height={16} borderRadius={6} /></td>
                     <td className="py-4 px-6"><Skeleton width={60} height={24} borderRadius={50} /></td>
-                    <td className="py-4 px-6"><Skeleton width={130} height={16} borderRadius={6} /></td>
-                    <td className="py-4 px-6"><Skeleton width={70} height={24} borderRadius={50} /></td>
+                    <td className="py-4 px-6"><Skeleton width={120} height={16} borderRadius={6} /></td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-end gap-2">
-                        <Skeleton width={32} height={32} borderRadius={8} />
                         <Skeleton width={32} height={32} borderRadius={8} />
                         <Skeleton width={32} height={32} borderRadius={8} />
                       </div>

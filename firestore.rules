@@ -2,6 +2,8 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── Schools ──────────────────────────────────────────────────────────────
     match /schools/{udiseNumber} {
       allow read: if request.auth != null;
 
@@ -12,5 +14,26 @@ service cloud.firestore {
       allow update, delete: if request.auth != null
         && resource.data.authUid == request.auth.uid;
     }
+
+    // ── Students ─────────────────────────────────────────────────────────────
+    // Path: students/{udise}/roster/{applicationNumber}
+    //
+    // The school document at schools/{udise} holds authUid.
+    // A teacher can only register students under their own school's UDISE.
+    match /students/{udise} {
+      // Allow reads on the school-level document (e.g. metadata)
+      allow read: if request.auth != null;
+
+      match /roster/{applicationNumber} {
+        // Any authenticated user can read student records (hall tickets, view students)
+        allow read: if request.auth != null;
+
+        // Only the school that owns this UDISE can create/update/delete students
+        allow write: if request.auth != null
+          && exists(/databases/$(database)/documents/schools/$(udise))
+          && get(/databases/$(database)/documents/schools/$(udise)).data.authUid == request.auth.uid;
+      }
+    }
+
   }
 }

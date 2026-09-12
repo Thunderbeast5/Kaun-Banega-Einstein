@@ -69,7 +69,7 @@ const SchoolDashboard = () => {
       case 'schedule':
         return <DashboardSchedule />;
       case 'view-students':
-        return <ViewStudents />;
+        return <ViewStudents schoolInfo={schoolInfo} />;
       default:
         return <DashboardHome />;
     }
