@@ -1,9 +1,13 @@
+import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../assets/KBE.png';
+import { auth } from '../lib/firebase';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -33,6 +37,14 @@ const Navbar = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(Boolean(user));
+    });
+
+    return unsubscribe;
   }, []);
 
   return (
@@ -101,11 +113,11 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* ================= RIGHT: REGISTER ================= */}
+        {/* ================= RIGHT: AUTH ACTION ================= */}
         <div>
-          <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
-            Register
-          </button>
+          <Link to={isLoggedIn ? '/dashboard' : '/auth'} className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
+            {isLoggedIn ? 'Dashboard' : 'Register'}
+          </Link>
         </div>
 
       </nav>
