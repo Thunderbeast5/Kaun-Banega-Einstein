@@ -35,5 +35,11 @@ service cloud.firestore {
       }
     }
 
+    // ── Admins ───────────────────────────────────────────────────────────────
+    // A signed-in user may only read their own admin document to verify access.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+    }
+
   }
 }

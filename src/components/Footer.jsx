@@ -59,10 +59,16 @@ const Footer = () => {
               Platform Tools
             </h6>
             <ul className="space-y-4 font-medium text-sm">
-              {['School Login', 'Student Info', 'Admin Panel', 'Certificate Verification', 'Results Dashboard'].map((link) => (
-                <li key={link}>
-                  <a href={`#${link.toLowerCase().replace(' ', '-')}`} className="text-slate-600 hover:text-blue-700 hover:translate-x-1 transition-transform inline-block">
-                    {link}
+              {[
+                { label: 'School Login', href: '/login' },
+                { label: 'Admin Login', href: '/admin/login' },
+                { label: 'Student Info', href: '#student-info' },
+                { label: 'Certificate Verification', href: '#certificate-verification' },
+                { label: 'Results Dashboard', href: '#results-dashboard' }
+              ].map((link) => (
+                <li key={link.label}>
+                  <a href={link.href} className="text-slate-600 hover:text-blue-700 hover:translate-x-1 transition-transform inline-block">
+                    {link.label}
                   </a>
                 </li>
               ))}
