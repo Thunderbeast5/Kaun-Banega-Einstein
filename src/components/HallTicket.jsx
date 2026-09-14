@@ -1,66 +1,81 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { FiUser, FiCalendar, FiAlertTriangle, FiPrinter } from 'react-icons/fi';
+import html2canvas from 'html2canvas-pro';
+import jsPDF from 'jspdf';
 import kbeLogo from '../assets/KBE.png';
+import kawaleLogo from '../assets/kawle.png';
 
 const HallTicket = ({ studentData }) => {
-  const componentRef = useRef();
+  const ticketRef = useRef(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Trigger browser print dialog, which allows saving as PDF perfectly scaled
-  const handlePrint = () => {
-    const printContent = componentRef.current;
-    const windowPrint = window.open('', '', 'width=900,height=650');
-    windowPrint.document.write(`
-      <html>
-        <head>
-          <title>Hall Ticket - ${studentData?.name || 'Student'}</title>
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            @page { size: A4; margin: 0; }
-            body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .hall-ticket { font-family: "Times New Roman", Times, serif; }
-          </style>
-        </head>
-        <body class="bg-white flex justify-center items-center">
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
-    windowPrint.document.close();
-    windowPrint.focus();
-    // Small timeout to allow Tailwind to process classes before printing
-    setTimeout(() => {
-      windowPrint.print();
-      windowPrint.close();
-    }, 500);
+  const handleDownloadPdf = async () => {
+    if (!ticketRef.current) return;
+    setIsGenerating(true);
+
+    try {
+      // Render the DOM node to a high-res canvas
+      const canvas = await html2canvas(ticketRef.current, {
+        scale: 3, // higher = sharper PDF, 3 is a good balance of quality vs file size
+        useCORS: true, // needed if kbeLogo or any image is loaded cross-origin
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: ticketRef.current.scrollWidth,
+        windowHeight: ticketRef.current.scrollHeight,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+
+      // A4 in mm
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      // Fit the captured canvas exactly onto one A4 page
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+
+      const fileName = `HallTicket_${studentData?.applicationNumber || 'KBE-26-0000'}.pdf`;
+      pdf.save(fileName);
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('Something went wrong generating the PDF. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center bg-slate-100 min-h-screen py-6 font-times">
+    <div className="flex flex-col items-center bg-slate-100 min-h-screen py-6 font-manrope">
       {/* Controls */}
       <div className="mb-6 flex gap-4">
-        <button 
-          onClick={handlePrint}
-          className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-blue-800 transition-colors"
+        <button
+          onClick={handleDownloadPdf}
+          disabled={isGenerating}
+          className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-blue-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <FiPrinter className="w-5 h-5" />
-          Save as PDF / Print
+          {isGenerating ? 'Generating PDF...' : 'Download as PDF'}
         </button>
       </div>
 
       {/* A4 Printable Container */}
-      <div 
-        ref={componentRef}
-        // Strict A4 dimensions
-        className="hall-ticket w-[210mm] h-[297mm] bg-white shadow-2xl relative overflow-hidden flex flex-col border border-slate-200 box-border"
+      <div
+        ref={ticketRef}
+        className="hall-ticket font-manrope w-[210mm] h-[297mm] bg-white shadow-2xl relative overflow-hidden flex flex-col border border-slate-200 box-border"
       >
         {/* Decorative Top Border */}
         <div className="h-3 w-full bg-blue-900" />
 
         <div className="px-8 py-5 flex-1 flex flex-col">
-          
+
           {/* --- HEADER SECTION --- */}
           <div className="flex items-center justify-between mb-4">
-            <img src={kbeLogo} alt="Kaun Banega Einstein logo" className="w-24 h-24 object-contain shrink-0" />
+            <img src={kbeLogo} alt="Kaun Banega Einstein logo" className="w-24 h-24 object-contain shrink-0" crossOrigin="anonymous" />
 
             {/* Center Text */}
             <div className="text-center flex-1 px-4">
@@ -72,13 +87,13 @@ const HallTicket = ({ studentData }) => {
                 Swami Vivekananda Institute
               </h2>
               <p className="text-sm font-medium text-slate-700 mt-1 mb-1">Organises</p>
-              
+
               <div className="inline-block mb-1">
                 <h2 className="text-3xl font-black text-blue-900 uppercase tracking-tight" style={{ WebkitTextStroke: '1px #1e3a8a' }}>
                   Kaun Banega Einstein 2026
                 </h2>
               </div>
-              
+
               <div className="bg-yellow-400 py-1 px-3 rounded-full border-2 border-blue-900 mx-auto">
                 <p className="text-xs font-bold text-blue-900 uppercase whitespace-nowrap">
                   Inter-School Science &amp; Innovation Examination
@@ -86,10 +101,7 @@ const HallTicket = ({ studentData }) => {
               </div>
             </div>
 
-            <div className="w-24 h-24 flex flex-col items-center justify-center shrink-0 text-center text-blue-900">
-              <span className="text-lg font-black">KBE</span>
-              <span className="text-xs font-bold">2026</span>
-            </div>
+            <img src={kawaleLogo} alt="B.K Kawale Jr. College of Science" className="w-24 h-24 object-contain shrink-0" crossOrigin="anonymous" />
           </div>
 
           {/* --- HALL TICKET BANNER & APP NO --- */}
@@ -97,7 +109,7 @@ const HallTicket = ({ studentData }) => {
             <div className="bg-blue-900 text-white px-10 py-2 rounded-t-xl rounded-br-xl inline-block">
               <h2 className="text-3xl font-black tracking-widest uppercase">Hall Ticket</h2>
             </div>
-            
+
             <div className="border-2 border-blue-900 p-2 text-center rounded-lg bg-slate-50 min-w-[140px]">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Application No.</p>
               <p className="text-lg font-black text-blue-900">{studentData?.applicationNumber || 'KBE-26-0000'}</p>
@@ -110,7 +122,7 @@ const HallTicket = ({ studentData }) => {
               <FiUser className="w-4 h-4" />
               <span className="text-sm font-bold tracking-wider uppercase">Student Details</span>
             </div>
-            
+
             <div className="flex justify-between gap-6">
               <div className="flex-1 space-y-4 text-sm">
                 <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
@@ -129,12 +141,12 @@ const HallTicket = ({ studentData }) => {
                   <span className="w-32 font-bold text-slate-700">Roll No.</span>
                   <span className="font-bold text-slate-900 pl-4">{studentData?.rollNo || '45-A'}</span>
                 </div>
-                  <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
-                    <span className="w-32 font-bold text-slate-700">Application No.</span>
-                    <span className="font-bold text-slate-900 pl-4">{studentData?.applicationNumber || 'KBE-26-0000'}</span>
-                  </div>
+                <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+                  <span className="w-32 font-bold text-slate-700">Application No.</span>
+                  <span className="font-bold text-slate-900 pl-4">{studentData?.applicationNumber || 'KBE-26-0000'}</span>
+                </div>
               </div>
-              
+
               {/* Photo Box */}
               <div className="w-[120px] h-[150px] border-2 border-slate-400 border-dashed rounded-lg flex flex-col items-center justify-center bg-slate-50 shrink-0 text-center p-2">
                 <FiUser className="w-12 h-12 text-slate-300 mb-2" />
@@ -149,7 +161,7 @@ const HallTicket = ({ studentData }) => {
               <FiCalendar className="w-4 h-4" />
               <span className="text-sm font-bold tracking-wider uppercase">Examination Details</span>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
               <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
                 <span className="w-28 font-bold text-slate-700">Exam Date</span>
@@ -176,7 +188,7 @@ const HallTicket = ({ studentData }) => {
               <FiAlertTriangle className="w-4 h-4" />
               <span className="text-sm font-black tracking-wider uppercase">Important Instructions</span>
             </div>
-            
+
             <ol className="list-decimal list-inside space-y-2 text-sm text-slate-800 font-medium leading-relaxed pl-2">
               <li>Bring this Hall Ticket along with a valid school ID card to the examination centre.</li>
               <li>Reach the venue at least <strong>30 minutes</strong> before the examination starts.</li>
@@ -201,9 +213,9 @@ const HallTicket = ({ studentData }) => {
               <span className="text-xs font-bold text-slate-600">Exam Coordinator</span>
             </div>
           </div>
-          
+
         </div>
-        
+
         {/* Decorative Bottom Banner */}
         <div className="w-full bg-blue-900 py-2 text-center shrink-0">
           <p className="text-yellow-400 text-xs font-bold italic tracking-wide whitespace-nowrap">
