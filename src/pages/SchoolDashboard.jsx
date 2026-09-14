@@ -63,7 +63,7 @@ const SchoolDashboard = () => {
       case 'register':
         return <RegisterStudents schoolInfo={schoolInfo} />;
       case 'tickets':
-        return <HallTickets />;
+      return <HallTickets schoolInfo={schoolInfo} />;
       case 'details':
         return <SchoolDetails schoolInfo={schoolInfo} />;
       case 'schedule':

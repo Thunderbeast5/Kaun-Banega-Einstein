@@ -11,7 +11,13 @@ service cloud.firestore {
         && request.resource.data.authUid == request.auth.uid
         && request.resource.data.udiseNumber == udiseNumber;
 
-      allow update, delete: if request.auth != null
+      // School's own coordinator OR an admin can update
+      allow update: if request.auth != null && (
+        resource.data.authUid == request.auth.uid
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+
+      allow delete: if request.auth != null
         && resource.data.authUid == request.auth.uid;
     }
 
