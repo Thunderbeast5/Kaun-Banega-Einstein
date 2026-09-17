@@ -1,12 +1,75 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getCountFromServer, getDocs } from 'firebase/firestore';
-import { FiDatabase, FiUsers, FiMapPin, FiFileText, FiRadio } from 'react-icons/fi';
+import { collection, getCountFromServer, getDocs, collectionGroup } from 'firebase/firestore';
+import { FiDatabase, FiUsers, FiMapPin, FiFileText, FiRadio, FiLoader } from 'react-icons/fi';
 import { firestore } from '../../lib/firebase';
 import AdminOverviewSkeleton from './skeletons/AdminOverviewSkeleton';
+import * as XLSX from 'xlsx';
 
 const AdminOverview = ({ setActiveTab }) => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState([]);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const rosterSnapshot = await getDocs(collectionGroup(firestore, 'roster'));
+      
+      if (rosterSnapshot.empty) {
+        alert("No students found in the database.");
+        setIsExporting(false);
+        return;
+      }
+
+      const students = [];
+      rosterSnapshot.forEach((doc) => {
+        const data = doc.data();
+        students.push({
+          "Application Number": data.applicationNumber || '',
+          "Roll Number": data.rollNumber || '',
+          "Student Name": data.name || '',
+          "Date of Birth": data.dob || '',
+          "Grade": data.grade || '',
+          "Division": data.division || '',
+          "School UDISE": data.udise || '',
+          "School Name": data.schoolName || '',
+          "Parent Name": data.parentName || '',
+          "Relation": data.relation || '',
+          "Mobile Number": data.mobile || '',
+          "Rank": data.rank || '',
+          "Score": data.score || '',
+          "Registered At": data.registeredAt?.toDate ? data.registeredAt.toDate().toLocaleString() : ''
+        });
+      });
+
+      // Group/Sort by School Name then Grade then Student Name
+      students.sort((a, b) => {
+        const schoolA = String(a["School Name"] || '');
+        const schoolB = String(b["School Name"] || '');
+        if (schoolA !== schoolB) return schoolA.localeCompare(schoolB);
+        
+        const gradeA = String(a["Grade"] || '');
+        const gradeB = String(b["Grade"] || '');
+        if (gradeA !== gradeB) return gradeA.localeCompare(gradeB);
+        
+        const nameA = String(a["Student Name"] || '');
+        const nameB = String(b["Student Name"] || '');
+        return nameA.localeCompare(nameB);
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(students);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Master Data");
+      
+      XLSX.writeFile(workbook, "KBE_Master_Data.xlsx");
+    } catch (error) {
+      console.error("Error exporting data:", error);
+      alert("Failed to export data. Please check the console for details.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -68,9 +131,13 @@ const AdminOverview = ({ setActiveTab }) => {
         </div>
         
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 hover:text-blue-700 hover:border-blue-300 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm">
-            <FiFileText className="w-4 h-4" />
-            <span>Export Master Data</span>
+          <button 
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 hover:text-blue-700 hover:border-blue-300 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isExporting ? <FiLoader className="w-4 h-4 animate-spin" /> : <FiFileText className="w-4 h-4" />}
+            <span>{isExporting ? 'Exporting...' : 'Export Master Data'}</span>
           </button>
           <button
             onClick={() => setActiveTab?.('broadcast')}
