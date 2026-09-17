@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { downloadBulkTemplate } from '../../lib/excel';
 import BulkUpload from './BulkUpload';
+import RegisterStudentsSkeleton from './skeletons/RegisterStudentsSkeleton';
 import { collection, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../../lib/firebase';
 import { uploadStudentPhoto, generateApplicationNumber } from '../../lib/cloudinary';
@@ -215,11 +216,7 @@ const RegisterStudents = ({ schoolInfo }) => {
   }
 
   if (loadingSettings) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <FiLoader className="w-8 h-8 animate-spin text-blue-500" />
-      </div>
-    );
+    return <RegisterStudentsSkeleton />;
   }
 
   if (!studentRegistrationsOpen) {
