@@ -24,9 +24,9 @@ service cloud.firestore {
     // ── Students ─────────────────────────────────────────────────────────────
     // Path: students/{udise}/roster/{applicationNumber}
     
-    // Allow collectionGroup('roster') reads for admins
+    // Allow collectionGroup('roster') reads for certificates
     match /{path=**}/roster/{applicationNumber} {
-      allow read: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      allow read: if true;
     }
     //
     // The school document at schools/{udise} holds authUid.
@@ -36,8 +36,8 @@ service cloud.firestore {
       allow read: if request.auth != null;
 
       match /roster/{applicationNumber} {
-        // Any authenticated user can read student records (hall tickets, view students)
-        allow read: if request.auth != null;
+        // Any user can read student records for certificates/hall tickets
+        allow read: if true;
 
         // Only the school that owns this UDISE can create/update/delete students
         allow write: if request.auth != null

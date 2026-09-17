@@ -11,6 +11,7 @@ import SchoolDashboard from './pages/SchoolDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import Results from './pages/Results'
+import CertificatePortal from './pages/CertificatePortal';
 import { auth, firestore } from './lib/firebase';
 
 function ProtectedRoute({ children }) {
@@ -69,6 +70,7 @@ export default function App() {
         <Route path="/login" element={<SchoolLogin />} />
         <Route path="/register" element={<SchoolRegistration />} />
         <Route path="/results" element={<Results />} />
+        <Route path="/certificate" element={<CertificatePortal />} />
         <Route path="/dashboard" element={<ProtectedRoute><SchoolDashboard /></ProtectedRoute>} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />

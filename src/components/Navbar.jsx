@@ -72,7 +72,7 @@ const Navbar = ({ forceDarkText = false }) => {
       : { path: '#rocket-launch', label: 'Rocket Launch' },
     { path: '#isro-prize', label: 'Prizes' },
     certificatesVisible
-      ? { path: '/certificates', label: 'Certificates' }
+      ? { path: '/certificate', label: 'Certificates' }
       : { path: '#contact', label: 'Contact' },
   ];
 
