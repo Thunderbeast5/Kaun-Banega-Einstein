@@ -3,7 +3,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { FiArrowLeft, FiShield } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
-import loginImage from '../assets/admin.png';
+import loginImage from '../assets/login.webp';
 import { auth, firestore } from '../lib/firebase';
 
 const AdminLogin = () => {

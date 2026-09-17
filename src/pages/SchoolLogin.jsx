@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
-import loginImage from '../assets/login.png';
+import loginImage from '../assets/admin.webp';
 import { auth } from '../lib/firebase';
 
 const SchoolLogin = () => {
