@@ -1,7 +1,7 @@
 import React from 'react';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { FiGrid, FiShield, FiSliders, FiLogOut,FiFileText,FiAward } from 'react-icons/fi';
+import { FiGrid, FiShield, FiSliders, FiLogOut, FiFileText, FiAward, FiRadio } from 'react-icons/fi';
 import { auth } from '../../lib/firebase';
 
 const AdminSidebar = ({ activeTab, setActiveTab }) => {
@@ -12,6 +12,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
     { id: 'registrations', label: 'School Registrations', icon: <FiShield className="w-5 h-5" /> },
     { id: 'tickets', label: 'Hall Tickets', icon: <FiFileText className="w-5 h-5" /> },
     { id: 'results', label: 'Results', icon: <FiAward className="w-5 h-5" /> },
+    { id: 'broadcast', label: 'Broadcast', icon: <FiRadio className="w-5 h-5" /> },
     { id: 'controls', label: 'Platform Controls', icon: <FiSliders className="w-5 h-5" /> },
   ];
 

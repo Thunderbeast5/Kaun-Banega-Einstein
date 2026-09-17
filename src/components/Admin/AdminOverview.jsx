@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { collection, getCountFromServer, getDocs } from 'firebase/firestore';
-import { FiDatabase, FiUsers, FiMapPin, FiShield, FiFileText, FiRadio } from 'react-icons/fi';
+import { FiDatabase, FiUsers, FiMapPin, FiFileText, FiRadio } from 'react-icons/fi';
 import { firestore } from '../../lib/firebase';
 import AdminOverviewSkeleton from './skeletons/AdminOverviewSkeleton';
 
-const AdminOverview = () => {
+const AdminOverview = ({ setActiveTab }) => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState([]);
 
@@ -72,7 +72,10 @@ const AdminOverview = () => {
             <FiFileText className="w-4 h-4" />
             <span>Export Master Data</span>
           </button>
-          <button className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-md">
+          <button
+            onClick={() => setActiveTab?.('broadcast')}
+            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-md"
+          >
             <FiRadio className="w-4 h-4" />
             <span>Broadcast Update</span>
           </button>
@@ -96,7 +99,6 @@ const AdminOverview = () => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };

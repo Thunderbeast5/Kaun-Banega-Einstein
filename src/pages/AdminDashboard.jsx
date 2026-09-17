@@ -9,6 +9,7 @@ import AdminApprovals from '../components/Admin/AdminApprovals';
 import AdminControls from '../components/Admin/AdminControls';
 import AdminTickets from '../components/Admin/AdminTickets';
 import AdminResults from '../components/Admin/AdminResults';
+import AdminBroadcast from '../components/Admin/AdminBroadcast';
 import AdminDashboardSkeleton from '../components/Admin/skeletons/AdminDashboardSkeleton';
 
 const AdminDashboard = () => {
@@ -27,7 +28,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <AdminOverview />;
+        return <AdminOverview setActiveTab={setActiveTab} />;
       case 'registrations':
         return <AdminApprovals />;
       case 'controls':
@@ -36,6 +37,8 @@ const AdminDashboard = () => {
         return <AdminTickets />;
     case 'results':
         return <AdminResults />;
+      case 'broadcast':
+        return <AdminBroadcast />;
       default:
         return <AdminOverview />;
     }
