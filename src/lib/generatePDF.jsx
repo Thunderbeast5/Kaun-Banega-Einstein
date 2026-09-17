@@ -25,20 +25,21 @@ export async function renderTicketCanvas(studentData) {
     root.render(<HallTicketPage studentData={studentData} />);
 
     requestAnimationFrame(async () => {
-      // Give images (Cloudinary photos) time to load
-      await new Promise((r) => setTimeout(r, 300));
+      // Give Cloudinary photo URLs time to load before capturing.
+      // 600 ms is enough for most photos; increase if photos still appear blank.
+      await new Promise((r) => setTimeout(r, 600));
       try {
         const el = container.firstElementChild;
         const canvas = await html2canvas(el, {
-          scale: 2,
+          scale: 3,               // match HallTicket.jsx (higher = sharper, matches single-ticket quality)
           useCORS: true,
           allowTaint: false,
           backgroundColor: '#ffffff',
           logging: false,
-          width: 794,
-          height: 1123,
-          windowWidth: 794,
-          windowHeight: 1123,
+          // Read the element's actual rendered size (Tailwind w-[210mm] h-[297mm])
+          // instead of hardcoded pixels — this is what causes the layout mismatch.
+          windowWidth:  el.scrollWidth,
+          windowHeight: el.scrollHeight,
         });
         resolve(canvas);
       } catch (err) {

@@ -1,10 +1,15 @@
+import { FiUser, FiCalendar, FiAlertTriangle } from 'react-icons/fi';
 import kbeLogo from '../assets/KBE.png';
 import kawaleLogo from '../assets/kawle.png';
 
 /**
- * A pure-visual hall ticket page — no buttons, no download logic.
- * Used for headless rendering (html2canvas → jsPDF bulk generation).
- * Mount off-screen, capture with html2canvas, then unmount.
+ * Pure-visual hall ticket — NO buttons, NO download logic.
+ * Used for headless off-screen rendering in the bulk PDF generator.
+ *
+ * Uses IDENTICAL Tailwind markup to HallTicket.jsx so the output matches
+ * the single-ticket preview exactly. (Previous inline-pixel-style version
+ * produced a different layout because html2canvas clips to pixel dimensions
+ * rather than the browser's mm-to-px conversion used by Tailwind.)
  *
  * Props:
  *   studentData: {
@@ -14,143 +19,163 @@ import kawaleLogo from '../assets/kawle.png';
  */
 const HallTicketPage = ({ studentData = {} }) => {
   const {
-    name = 'Student Name',
-    school = 'School Name',
-    grade = '',
-    division = '',
-    rollNumber = '—',
+    name           = 'Student Name',
+    school         = 'School Name',
+    grade          = '',
+    division       = '',
+    rollNumber     = '—',
     applicationNumber = 'KBE-26-0000',
-    photoUrl = null,
+    photoUrl       = null,
   } = studentData;
 
-  const standard = grade ? `${grade}th${division ? ` – ${division}` : ''}` : '—';
-
-  const sectionLabel = (text) => ({
-    position: 'absolute', top: '-14px', left: '20px',
-    background: '#1e3a8a', color: '#fff',
-    padding: '5px 14px', borderRadius: '999px',
-    fontSize: '11px', fontWeight: 700,
-    textTransform: 'uppercase', letterSpacing: '0.05em',
-  });
+  const standard = grade
+    ? `${grade}${division ? ` – ${division}` : ''}`
+    : '—';
 
   return (
-    <div
-      style={{
-        fontFamily: "'Manrope', sans-serif",
-        background: '#ffffff',
-        display: 'flex', flexDirection: 'column',
-        border: '1px solid #e2e8f0',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        width: '794px',
-        height: '1123px',
-      }}
-    >
+    /* Outer wrapper must match HallTicket.jsx exactly */
+    <div className="hall-ticket font-manrope w-[210mm] h-[297mm] bg-white relative overflow-hidden flex flex-col border border-slate-200 box-border">
+
       {/* Decorative Top Border */}
-      <div style={{ height: '12px', background: '#1e3a8a', flexShrink: 0 }} />
+      <div className="h-3 w-full bg-blue-900" />
 
-      <div style={{ padding: '28px 36px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div className="px-8 py-5 flex-1 flex flex-col">
 
-        {/* HEADER */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <img src={kbeLogo} alt="KBE" crossOrigin="anonymous" style={{ width: '88px', height: '88px', objectFit: 'contain' }} />
+        {/* ── HEADER ────────────────────────────────────────────────── */}
+        <div className="flex items-center justify-between mb-4">
+          <img
+            src={kbeLogo}
+            alt="Kaun Banega Einstein logo"
+            className="w-24 h-24 object-contain shrink-0"
+            crossOrigin="anonymous"
+          />
 
-          <div style={{ flex: 1, textAlign: 'center', padding: '0 16px' }}>
-            <div style={{ fontSize: '17px', fontWeight: 900, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div className="text-center flex-1 px-4">
+            <h1 className="text-xl font-extrabold text-blue-900 uppercase tracking-wide">
               B. K. Kawale Jr. College of Science
+            </h1>
+            <p className="text-sm font-medium text-slate-700 mt-1">in association with</p>
+            <h2 className="text-lg font-bold text-blue-800 mt-1">Swami Vivekananda Institute</h2>
+            <p className="text-sm font-medium text-slate-700 mt-1 mb-1">Organises</p>
+
+            <div className="inline-block mb-1">
+              <h2 className="text-3xl font-black text-blue-900 uppercase tracking-tight" style={{ WebkitTextStroke: '1px #1e3a8a' }}>
+                Kaun Banega Einstein 2026
+              </h2>
             </div>
-            <div style={{ fontSize: '12px', color: '#475569', marginTop: '4px' }}>in association with</div>
-            <div style={{ fontSize: '15px', fontWeight: 800, color: '#1d4ed8', marginTop: '3px' }}>
-              Swami Vivekananda Institute
-            </div>
-            <div style={{ fontSize: '12px', color: '#475569', marginTop: '3px', marginBottom: '4px' }}>Organises</div>
-            <div style={{ fontSize: '26px', fontWeight: 900, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-              Kaun Banega Einstein 2026
-            </div>
-            <div style={{ display: 'inline-block', background: '#facc15', padding: '3px 12px', borderRadius: '999px', border: '2px solid #1e3a8a', marginTop: '4px' }}>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#1e3a8a', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+
+            <div className="bg-yellow-400 py-1 px-3 rounded-full border-2 border-blue-900 mx-auto">
+              <p className="text-xs font-bold text-blue-900 uppercase whitespace-nowrap">
                 Inter-School Science &amp; Innovation Examination
-              </span>
+              </p>
             </div>
           </div>
 
-          <img src={kawaleLogo} alt="Kawale College" crossOrigin="anonymous" style={{ width: '88px', height: '88px', objectFit: 'contain' }} />
+          <img
+            src={kawaleLogo}
+            alt="B.K Kawale Jr. College of Science"
+            className="w-24 h-24 object-contain shrink-0"
+            crossOrigin="anonymous"
+          />
         </div>
 
-        {/* HALL TICKET BANNER */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '4px solid #1e3a8a', paddingBottom: '8px', marginBottom: '16px' }}>
-          <div style={{ background: '#1e3a8a', color: '#fff', padding: '6px 36px', borderRadius: '10px 10px 10px 0', display: 'inline-block' }}>
-            <span style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Hall Ticket</span>
+        {/* ── HALL TICKET BANNER & APP NO ───────────────────────────── */}
+        <div className="flex items-end justify-between border-b-4 border-blue-900 pb-2 mb-4">
+          <div className="bg-blue-900 text-white px-10 py-2 rounded-t-xl rounded-br-xl inline-block">
+            <h2 className="text-3xl font-black tracking-widest uppercase">Hall Ticket</h2>
           </div>
-          <div style={{ border: '2px solid #1e3a8a', padding: '6px 12px', textAlign: 'center', borderRadius: '8px', background: '#f8fafc', minWidth: '140px' }}>
-            <div style={{ fontSize: '9px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Application No.</div>
-            <div style={{ fontSize: '16px', fontWeight: 900, color: '#1e3a8a' }}>{applicationNumber}</div>
+          <div className="border-2 border-blue-900 p-2 text-center rounded-lg bg-slate-50 min-w-[140px]">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Application No.</p>
+            <p className="text-lg font-black text-blue-900">{applicationNumber}</p>
           </div>
         </div>
 
-        {/* STUDENT DETAILS */}
-        <div style={{ position: 'relative', border: '2px solid #dbeafe', borderRadius: '16px', padding: '20px', paddingTop: '28px', marginBottom: '14px' }}>
-          <div style={sectionLabel()}>Student Details</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
-              {[
-                ['Student Name', name],
-                ['School Name', school],
-                ['Standard', standard],
-                ['Roll No.', rollNumber],
-                ['Application No.', applicationNumber],
-              ].map(([label, value]) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'flex-end', borderBottom: '1px dashed #cbd5e1', paddingBottom: '4px' }}>
-                  <span style={{ width: '130px', fontWeight: 700, color: '#475569', flexShrink: 0 }}>{label}</span>
-                  <span style={{ fontWeight: 700, color: '#0f172a', paddingLeft: '12px' }}>{value}</span>
-                </div>
-              ))}
+        {/* ── STUDENT DETAILS ───────────────────────────────────────── */}
+        <div className="mb-4 relative border-2 border-blue-100 rounded-2xl p-5 pt-7">
+          <div className="absolute -top-4 left-6 bg-blue-900 text-white px-4 py-1.5 rounded-full flex items-center gap-2">
+            <FiUser className="w-4 h-4" />
+            <span className="text-sm font-bold tracking-wider uppercase">Student Details</span>
+          </div>
+
+          <div className="flex justify-between gap-6">
+            <div className="flex-1 space-y-4 text-sm">
+              <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+                <span className="w-32 font-bold text-slate-700">Student Name</span>
+                <span className="font-bold text-slate-900 pl-4">{name}</span>
+              </div>
+              <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+                <span className="w-32 font-bold text-slate-700">School Name</span>
+                <span className="font-bold text-slate-900 pl-4">{school}</span>
+              </div>
+              <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+                <span className="w-32 font-bold text-slate-700">Standard</span>
+                <span className="font-bold text-slate-900 pl-4">{standard}</span>
+              </div>
+              <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+                <span className="w-32 font-bold text-slate-700">Roll No.</span>
+                <span className="font-bold text-slate-900 pl-4">{rollNumber}</span>
+              </div>
+              <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+                <span className="w-32 font-bold text-slate-700">Application No.</span>
+                <span className="font-bold text-slate-900 pl-4">{applicationNumber}</span>
+              </div>
             </div>
 
-            {/* Photo Box */}
-            <div style={{
-              width: '110px', height: '140px', flexShrink: 0,
-              border: photoUrl ? '2px solid #e2e8f0' : '2px dashed #94a3b8',
-              borderRadius: '8px', overflow: 'hidden', background: '#f8fafc',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
+            {/* Photo Box — real photo if available, placeholder otherwise */}
+            <div className="w-[120px] h-[150px] border-2 border-slate-400 border-dashed rounded-lg flex flex-col items-center justify-center bg-slate-50 shrink-0 overflow-hidden">
               {photoUrl ? (
-                <img src={photoUrl} alt="Candidate" crossOrigin="anonymous"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img
+                  src={photoUrl}
+                  alt="Candidate"
+                  crossOrigin="anonymous"
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <div style={{ textAlign: 'center', padding: '8px' }}>
-                  <div style={{ fontSize: '36px', color: '#cbd5e1', marginBottom: '6px' }}>👤</div>
-                  <div style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 700 }}>Paste Passport<br />Size Photo Here</div>
-                </div>
+                <>
+                  <FiUser className="w-12 h-12 text-slate-300 mb-2" />
+                  <span className="text-[10px] text-slate-400 font-bold text-center">
+                    Paste Passport<br />Size Photo Here
+                  </span>
+                </>
               )}
             </div>
           </div>
         </div>
 
-        {/* EXAMINATION DETAILS */}
-        <div style={{ position: 'relative', border: '2px solid #dbeafe', borderRadius: '16px', padding: '20px', paddingTop: '28px', marginBottom: '14px' }}>
-          <div style={sectionLabel()}>Examination Details</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '13px' }}>
-            {[
-              ['Exam Date', '24 November 2026', false],
-              ['Reporting Time', '09:30 AM', false],
-              ['Exam Time', '10:00 AM – 12:00 PM', true],
-              ['Venue', 'B. K. Kawale Jr. College of Science Campus', true],
-            ].map(([label, value, span]) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'flex-end', borderBottom: '1px dashed #cbd5e1', paddingBottom: '4px', gridColumn: span ? 'span 2' : 'span 1' }}>
-                <span style={{ width: '130px', fontWeight: 700, color: '#475569', flexShrink: 0 }}>{label}</span>
-                <span style={{ fontWeight: 700, color: '#1e3a8a', paddingLeft: '8px' }}>{value}</span>
-              </div>
-            ))}
+        {/* ── EXAMINATION DETAILS ───────────────────────────────────── */}
+        <div className="mb-4 relative border-2 border-blue-100 rounded-2xl p-5 pt-7">
+          <div className="absolute -top-4 left-6 bg-blue-900 text-white px-4 py-1.5 rounded-full flex items-center gap-2">
+            <FiCalendar className="w-4 h-4" />
+            <span className="text-sm font-bold tracking-wider uppercase">Examination Details</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+            <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+              <span className="w-28 font-bold text-slate-700">Exam Date</span>
+              <span className="font-bold text-blue-900 pl-2">24 November 2026</span>
+            </div>
+            <div className="flex items-end border-b border-dashed border-slate-300 pb-1 col-span-2">
+              <span className="w-28 font-bold text-slate-700">Reporting Time</span>
+              <span className="font-bold text-blue-900 pl-2">09:30 AM</span>
+            </div>
+            <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
+              <span className="w-28 font-bold text-slate-700">Exam Time</span>
+              <span className="font-bold text-blue-900 pl-2">10:00 AM – 12:00 PM</span>
+            </div>
+            <div className="flex items-end border-b border-dashed border-slate-300 pb-1 col-span-2">
+              <span className="w-28 font-bold text-slate-700">Venue</span>
+              <span className="font-bold text-slate-900 pl-2">B. K. Kawale Jr. College of Science Campus</span>
+            </div>
           </div>
         </div>
 
-        {/* INSTRUCTIONS */}
-        <div style={{ position: 'relative', border: '2px solid #facc15', borderRadius: '16px', padding: '16px', paddingTop: '26px', marginBottom: '14px', background: 'rgba(254,252,232,0.3)' }}>
-          <div style={{ position: 'absolute', top: '-14px', left: '20px', background: '#facc15', color: '#1e3a8a', padding: '5px 14px', borderRadius: '999px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Important Instructions
+        {/* ── INSTRUCTIONS ─────────────────────────────────────────── */}
+        <div className="mb-4 relative border-2 border-yellow-400 bg-yellow-50/30 rounded-2xl p-5 pt-7">
+          <div className="absolute -top-4 left-6 bg-yellow-400 text-blue-900 px-4 py-1.5 rounded-full flex items-center gap-2">
+            <FiAlertTriangle className="w-4 h-4" />
+            <span className="text-sm font-black tracking-wider uppercase">Important Instructions</span>
           </div>
-          <ol style={{ paddingLeft: '18px', margin: 0, fontSize: '12px', color: '#1e293b', fontWeight: 500, lineHeight: '1.7' }}>
+          <ol className="list-decimal list-inside space-y-2 text-sm text-slate-800 font-medium leading-relaxed pl-2">
             <li>Bring this Hall Ticket along with a valid school ID card to the examination centre.</li>
             <li>Reach the venue at least <strong>30 minutes</strong> before the examination starts.</li>
             <li>Mobile phones, smartwatches, and electronic gadgets are strictly prohibited inside the hall.</li>
@@ -159,20 +184,21 @@ const HallTicketPage = ({ studentData = {} }) => {
           </ol>
         </div>
 
-        {/* SIGNATURES */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 16px', marginTop: 'auto' }}>
+        {/* ── SIGNATURES ───────────────────────────────────────────── */}
+        <div className="flex justify-between items-end px-4 mt-auto">
           {["Student's Signature", 'Class Teacher', 'Exam Coordinator'].map((label) => (
-            <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '150px', borderBottom: '1px solid #94a3b8', marginBottom: '6px' }} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b' }}>{label}</span>
+            <div key={label} className="flex flex-col items-center">
+              <div className="w-40 border-b border-slate-400 mb-2" />
+              <span className="text-xs font-bold text-slate-600">{label}</span>
             </div>
           ))}
         </div>
+
       </div>
 
       {/* Decorative Bottom Banner */}
-      <div style={{ background: '#1e3a8a', padding: '8px', textAlign: 'center', flexShrink: 0 }}>
-        <p style={{ color: '#facc15', fontSize: '11px', fontWeight: 700, fontStyle: 'italic', letterSpacing: '0.04em', margin: 0 }}>
+      <div className="w-full bg-blue-900 py-2 text-center shrink-0">
+        <p className="text-yellow-400 text-xs font-bold italic tracking-wide whitespace-nowrap">
           "Think. Question. Discover. Become the next Einstein!"
         </p>
       </div>
