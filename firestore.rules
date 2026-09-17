@@ -23,6 +23,11 @@ service cloud.firestore {
 
     // ── Students ─────────────────────────────────────────────────────────────
     // Path: students/{udise}/roster/{applicationNumber}
+    
+    // Allow collectionGroup('roster') reads for admins
+    match /{path=**}/roster/{applicationNumber} {
+      allow read: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
     //
     // The school document at schools/{udise} holds authUid.
     // A teacher can only register students under their own school's UDISE.
