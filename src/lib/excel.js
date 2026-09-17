@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 // Column definitions — order matches template columns
 export const BULK_COLUMNS = [
   { header: 'Student Full Name',    field: 'name',       example: 'Aarav Sharma',  note: 'Required — Full name of the student' },
+  { header: 'Date of Birth',        field: 'dob',        example: '2008-05-15',    note: 'Required — YYYY-MM-DD' },
   { header: 'Class',                field: 'grade',      example: '10',            note: 'Required — Enter 9 or 10 only' },
   { header: 'Division',             field: 'division',   example: 'A',             note: 'Required — A, B, C, D, E or F' },
   { header: 'Roll Number',          field: 'rollNumber', example: '30A',           note: 'Required — Alphanumeric, e.g. 30 or 30A' },
@@ -61,7 +62,7 @@ export async function parseBulkFile(file) {
   });
 
   // Check all required columns are present
-  const required = ['name', 'grade', 'division', 'rollNumber', 'parentName', 'relation', 'mobile'];
+  const required = ['name', 'dob', 'grade', 'division', 'rollNumber', 'parentName', 'relation', 'mobile'];
   const missing = required
     .filter(f => colMap[f] === undefined)
     .map(f => BULK_COLUMNS.find(c => c.field === f)?.header);

@@ -13,6 +13,7 @@ import { uploadStudentPhoto, generateApplicationNumber } from '../../lib/cloudin
 // ─── Initial form state ───────────────────────────────────────────────────────
 const INITIAL_FORM = {
   name: '',
+  dob: '',
   grade: '',
   division: '',
   rollNumber: '',
@@ -127,6 +128,7 @@ const RegisterStudents = ({ schoolInfo }) => {
       await setDoc(studentDocRef, {
         applicationNumber: appNum,
         name: form.name.trim(),
+        dob: form.dob,
         grade: form.grade,
         division: form.division,
         rollNumber: form.rollNumber.trim().toUpperCase(),
@@ -269,6 +271,17 @@ const RegisterStudents = ({ schoolInfo }) => {
                     name="name"
                     placeholder="e.g. Aarav Sharma"
                     value={form.name}
+                    onChange={handleInput}
+                    required
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputField
+                    label="Date of Birth"
+                    name="dob"
+                    type="date"
+                    value={form.dob}
                     onChange={handleInput}
                     required
                   />

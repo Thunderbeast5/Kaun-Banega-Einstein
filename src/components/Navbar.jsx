@@ -10,6 +10,7 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [resultsVisible, setResultsVisible] = useState(false);
+  const [certificatesVisible, setCertificatesVisible] = useState(false);
 
   // Scroll behaviour
   useEffect(() => {
@@ -52,11 +53,28 @@ const Navbar = () => {
       (snap) => {
         const data = snap.exists() ? snap.data() : {};
         setResultsVisible(Boolean(data.resultsVisible));
+        setCertificatesVisible(Boolean(data.certificatesVisible));
       },
-      () => setResultsVisible(false),
+      () => {
+        setResultsVisible(false);
+        setCertificatesVisible(false);
+      },
     );
     return unsubscribe;
   }, []);
+
+  // Dynamically build center navigation links
+  const navLinks = [
+    { path: '#about', label: 'About' },
+    { path: '#structure', label: 'Structure' },
+    resultsVisible
+      ? { path: '/results', label: 'Results' }
+      : { path: '#rocket-launch', label: 'Rocket Launch' },
+    { path: '#isro-prize', label: 'Prizes' },
+    certificatesVisible
+      ? { path: '/certificates', label: 'Certificates' }
+      : { path: '#contact', label: 'Contact' },
+  ];
 
   return (
     <div
@@ -100,34 +118,28 @@ const Navbar = () => {
 
         {/* ── Center nav ── */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-10 text-base font-semibold tracking-wide">
-          {['#about', '#structure', '#rocket-launch', '#isro-prize', '#contact'].map((href, i) => (
-            <a
-              key={href}
-              href={href}
-              className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}
-            >
-              {['About', 'Structure', 'Rocket Launch', 'Prizes', 'Contact'][i]}
-            </a>
-          ))}
+          {navLinks.map(({ path, label }) => {
+            const className = `${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`;
+            return path.startsWith('#') ? (
+              <a key={path} href={path} className={className}>
+                {label}
+              </a>
+            ) : (
+              <Link key={path} to={path} className={className}>
+                {label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* ── Right CTA ── */}
         <div>
-          {resultsVisible ? (
-            <Link
-              to="/results"
-              className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105"
-            >
-              Results
-            </Link>
-          ) : (
-            <Link
-              to={isLoggedIn ? '/dashboard' : '/auth'}
-              className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105"
-            >
-              {isLoggedIn ? 'Dashboard' : 'Register'}
-            </Link>
-          )}
+          <Link
+            to={isLoggedIn ? '/dashboard' : '/auth'}
+            className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            {isLoggedIn ? 'Dashboard' : 'Register'}
+          </Link>
         </div>
       </nav>
     </div>

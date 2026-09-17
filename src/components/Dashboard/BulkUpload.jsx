@@ -11,6 +11,7 @@ import { parseBulkFile } from '../../lib/excel';
 // ─── Row validation & normalisation ──────────────────────────────────────────
 function processRow(raw, udise, photoMap) {
   const name       = String(raw.name       ?? '').trim();
+  const dob        = String(raw.dob        ?? '').trim();
   const grade      = String(raw.grade      ?? '').trim();
   const division   = String(raw.division   ?? '').toUpperCase().trim();
   const rollNumber = String(raw.rollNumber ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -21,6 +22,7 @@ function processRow(raw, udise, photoMap) {
 
   const errors = [];
   if (!name)                                  errors.push('Name required');
+  if (!dob)                                   errors.push('DOB required');
   if (!['9','10'].includes(grade))            errors.push('Class must be 9 or 10');
   if (!['A','B','C','D','E','F'].includes(division)) errors.push('Division invalid (A–F)');
   if (!rollNumber)                            errors.push('Roll number required');
@@ -33,7 +35,7 @@ function processRow(raw, udise, photoMap) {
   const photoMatched = photoKey ? photoMap.has(photoKey) : false;
 
   return {
-    name, grade, division, rollNumber, parentName, relation, mobile, photoFile,
+    name, dob, grade, division, rollNumber, parentName, relation, mobile, photoFile,
     _rowNum: raw._rowNum,
     appNumber,
     photoMatched,
@@ -167,6 +169,7 @@ const BulkUpload = ({ schoolInfo }) => {
           await setDoc(docRef, {
             applicationNumber: row.appNumber,
             name:       row.name,
+            dob:        row.dob,
             grade:      row.grade,
             division:   row.division,
             rollNumber: row.rollNumber,

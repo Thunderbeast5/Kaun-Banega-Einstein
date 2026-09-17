@@ -9,6 +9,7 @@ const defaultSettings = {
   registrationsOpen: true,
   studentRegistrationsOpen: true,
   resultsVisible: false,
+  certificatesVisible: false,
 };
 
 // ─── Toggle Row ───────────────────────────────────────────────────────────────
@@ -89,8 +90,14 @@ const AdminControls = () => {
     {
       key: 'resultsVisible',
       label: 'Results',
-      descOn:  'Visible — Results link appears in navbar.',
+      descOn:  'Visible — Results link appears in navbar (replaces Rocket Launch).',
       descOff: 'Hidden — Results page is not accessible.',
+    },
+    {
+      key: 'certificatesVisible',
+      label: 'Certificates',
+      descOn:  'Visible — Certificates link appears in navbar (replaces Contact).',
+      descOff: 'Hidden — Certificates page is not accessible.',
     },
   ];
 
