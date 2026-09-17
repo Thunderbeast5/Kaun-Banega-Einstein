@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiStar, FiMapPin, FiUsers, FiAward } from 'react-icons/fi';
+import isroLogo from '../assets/img.png';
 
 const ISROPrize = () => {
   return (
@@ -41,7 +42,7 @@ const ISROPrize = () => {
           <div className="relative z-10 flex flex-col md:flex-row items-stretch">
             <div className="w-full md:w-2/5 p-10 md:p-12 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-white/40">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-[6px] border-white bg-white flex items-center justify-center p-1 shadow-md mb-6 group-hover:scale-105 transition-transform duration-500">
-                  <img src="src/assets/img.png" alt="ISRO" className="w-full h-full rounded-full object-cover" />
+                  <img src={isroLogo} alt="ISRO" className="w-full h-full rounded-full object-cover" />
               </div>
               <div className="flex items-center gap-2 text-blue-800 font-bold tracking-widest uppercase text-sm bg-white/60 px-4 py-2 rounded-full shadow-sm">
                 <FiMapPin className="w-4 h-4" /> 
