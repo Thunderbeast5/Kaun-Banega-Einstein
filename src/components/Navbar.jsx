@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import logo from '../assets/KBE.png';
 import { auth, firestore } from '../lib/firebase';
 
-const Navbar = () => {
+const Navbar = ({ forceDarkText = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -102,7 +102,8 @@ const Navbar = () => {
         />
 
         {/* ── Logo ── */}
-        <div
+        <Link
+          to="/"
           className="flex items-center gap-4 cursor-pointer select-none"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
@@ -111,15 +112,15 @@ const Navbar = () => {
             alt="Kaun Banega Einstein"
             className={`rounded-full object-cover border-2 border-white/20 shadow-lg transition-all duration-300 ease-in-out ${isScrolled ? 'w-12 h-12' : 'w-16 h-16'}`}
           />
-          <span className={`font-semibold tracking-wide transition-all duration-300 ease-in-out ${isScrolled ? 'text-slate-900 drop-shadow-none text-lg' : 'text-white drop-shadow-md text-xl md:text-2xl'}`}>
+          <span className={`font-semibold tracking-wide transition-all duration-300 ease-in-out ${isScrolled ? 'text-lg' : 'text-xl md:text-2xl'} ${isScrolled || forceDarkText ? 'text-slate-900 drop-shadow-none' : 'text-white drop-shadow-md'}`}>
             Kaun Banega Einstein
           </span>
-        </div>
+        </Link>
 
         {/* ── Center nav ── */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-10 text-base font-semibold tracking-wide">
           {navLinks.map(({ path, label }) => {
-            const className = `${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`;
+            const className = `${isScrolled || forceDarkText ? 'text-slate-900 hover:text-blue-700' : 'text-white drop-shadow-md hover:text-yellow-400'} transition-colors duration-300 cursor-pointer`;
             return path.startsWith('#') ? (
               <a key={path} href={path} className={className}>
                 {label}
