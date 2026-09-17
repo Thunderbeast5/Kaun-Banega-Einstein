@@ -1,14 +1,17 @@
 import { onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/KBE.png';
-import { auth } from '../lib/firebase';
+import { auth, firestore } from '../lib/firebase';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [resultsVisible, setResultsVisible] = useState(false);
 
+  // Scroll behaviour
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ticking = false;
@@ -17,17 +20,12 @@ const Navbar = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
-
-          // Hysteresis: Toggle pill shape based on scroll depth
           setIsScrolled(currentScrollY > 60);
-
-          // Toggle visibility: Hide on scroll down, show on scroll up
           if (currentScrollY < lastScrollY || currentScrollY <= 100) {
             setIsVisible(true);
           } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
             setIsVisible(false);
           }
-
           lastScrollY = currentScrollY;
           ticking = false;
         });
@@ -39,11 +37,24 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(Boolean(user));
     });
+    return unsubscribe;
+  }, []);
 
+  // Live-listen to platform controls — updates navbar instantly when admin toggles
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      doc(firestore, 'settings', 'platformControls'),
+      (snap) => {
+        const data = snap.exists() ? snap.data() : {};
+        setResultsVisible(Boolean(data.resultsVisible));
+      },
+      () => setResultsVisible(false),
+    );
     return unsubscribe;
   }, []);
 
@@ -58,10 +69,12 @@ const Navbar = () => {
       <nav
         className={`
           pointer-events-auto relative flex items-center justify-between w-full font-manrope border transition-all duration-300 ease-in-out
-          ${isScrolled ? 'max-w-6xl px-7 py-3 rounded-full border-white/30' : 'max-w-full px-2 md:px-6 py-2 rounded-full border-transparent'}
+          ${isScrolled
+            ? 'max-w-6xl px-7 py-3 rounded-full border-white/30'
+            : 'max-w-full px-2 md:px-6 py-2 rounded-full border-transparent'}
         `}
       >
-        {/* Backdrop layer */}
+        {/* Backdrop */}
         <div
           aria-hidden
           className={`
@@ -70,7 +83,7 @@ const Navbar = () => {
           `}
         />
 
-        {/* ================= LEFT: LOGO ================= */}
+        {/* ── Logo ── */}
         <div
           className="flex items-center gap-4 cursor-pointer select-none"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -78,48 +91,44 @@ const Navbar = () => {
           <img
             src={logo}
             alt="Kaun Banega Einstein"
-            className={`
-              rounded-full object-cover border-2 border-white/20 shadow-lg transition-all duration-300 ease-in-out
-              ${isScrolled ? 'w-12 h-12' : 'w-16 h-16'}
-            `}
+            className={`rounded-full object-cover border-2 border-white/20 shadow-lg transition-all duration-300 ease-in-out ${isScrolled ? 'w-12 h-12' : 'w-16 h-16'}`}
           />
-
-          <span
-            className={`
-              ${isScrolled ? 'text-slate-900 drop-shadow-none' : 'text-white drop-shadow-md'} font-semibold tracking-wide transition-all duration-300 ease-in-out
-              ${isScrolled ? 'text-lg' : 'text-xl md:text-2xl'}
-            `}
-          >
+          <span className={`font-semibold tracking-wide transition-all duration-300 ease-in-out ${isScrolled ? 'text-slate-900 drop-shadow-none text-lg' : 'text-white drop-shadow-md text-xl md:text-2xl'}`}>
             Kaun Banega Einstein
           </span>
         </div>
 
-        {/* ================= CENTER: NAVIGATION ================= */}
+        {/* ── Center nav ── */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-10 text-base font-semibold tracking-wide">
-          <a href="#about" className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}>
-            About
-          </a>
-          <a href="#structure" className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}>
-            Structure
-          </a>
-          <a href="#rocket-launch" className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}>
-            Rocket Launch
-          </a>
-          <a href="#isro-prize" className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}>
-            Prizes
-          </a>
-          <a href="#contact" className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}>
-            Contact
-          </a>
+          {['#about', '#structure', '#rocket-launch', '#isro-prize', '#contact'].map((href, i) => (
+            <a
+              key={href}
+              href={href}
+              className={`${isScrolled ? 'text-slate-900' : 'text-white drop-shadow-md'} hover:text-yellow-400 transition-colors duration-300 cursor-pointer`}
+            >
+              {['About', 'Structure', 'Rocket Launch', 'Prizes', 'Contact'][i]}
+            </a>
+          ))}
         </div>
 
-        {/* ================= RIGHT: AUTH ACTION ================= */}
+        {/* ── Right CTA ── */}
         <div>
-          <Link to={isLoggedIn ? '/dashboard' : '/auth'} className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
-            {isLoggedIn ? 'Dashboard' : 'Register'}
-          </Link>
+          {resultsVisible ? (
+            <Link
+              to="/results"
+              className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              Results
+            </Link>
+          ) : (
+            <Link
+              to={isLoggedIn ? '/dashboard' : '/auth'}
+              className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-semibold text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              {isLoggedIn ? 'Dashboard' : 'Register'}
+            </Link>
+          )}
         </div>
-
       </nav>
     </div>
   );

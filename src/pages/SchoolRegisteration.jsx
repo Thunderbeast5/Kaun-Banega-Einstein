@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
-import { FiArrowLeft, FiCheckCircle, FiX } from 'react-icons/fi';
+import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { FiArrowLeft, FiCheckCircle, FiX, FiLock } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import schools from '../../data/schools.json';
 import { auth, firestore } from '../lib/firebase';
@@ -10,6 +10,8 @@ const schoolByUdise = new Map(schools.map((school) => [school.udise_code, school
 
 const SchoolRegistration = () => {
   const navigate = useNavigate();
+  const [registrationsOpen, setRegistrationsOpen] = useState(true);
+  const [checkingStatus, setCheckingStatus] = useState(true);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [udiseNumber, setUdiseNumber] = useState('');
   const [schoolName, setSchoolName] = useState('');
@@ -17,6 +19,17 @@ const SchoolRegistration = () => {
   const [lookupMessage, setLookupMessage] = useState('');
   const [submitMessage, setSubmitMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check if registrations are open
+  useEffect(() => {
+    getDoc(doc(firestore, 'settings', 'platformControls'))
+      .then(snap => {
+        const data = snap.exists() ? snap.data() : {};
+        setRegistrationsOpen(data.registrationsOpen !== false); // default true
+      })
+      .catch(() => setRegistrationsOpen(true)) // fail open
+      .finally(() => setCheckingStatus(false));
+  }, []);
 
   const handleUdiseChange = (event) => {
     const nextUdise = event.target.value.replace(/\D/g, '').slice(0, 11);
@@ -100,6 +113,42 @@ const SchoolRegistration = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading while checking status
+  if (checkingStatus) {
+    return (
+      <main className="relative min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  // Registrations closed screen
+  if (!registrationsOpen) {
+    return (
+      <main className="relative min-h-screen bg-slate-50 overflow-hidden flex items-center justify-center px-6">
+        <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-blue-400/10 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-cyan-400/10 rounded-full blur-[100px]" />
+        </div>
+        <Link to="/" className="fixed left-6 top-6 z-50 inline-flex rounded-full p-3 text-slate-700 hover:bg-white hover:text-blue-700 transition-colors shadow-sm">
+          <FiArrowLeft className="w-5 h-5" />
+        </Link>
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <FiLock className="w-7 h-7 text-slate-500" />
+          </div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Registrations Closed</h1>
+          <p className="text-slate-500 font-medium mb-8 leading-relaxed">
+            School registrations are currently closed. Please check back later or contact the KBE team for assistance.
+          </p>
+          <Link to="/" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-full font-bold text-sm transition-all shadow-md">
+            Back to Home
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-screen bg-slate-50 overflow-hidden py-24 z-0">

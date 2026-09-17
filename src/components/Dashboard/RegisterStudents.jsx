@@ -1,12 +1,12 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   FiPlus, FiDownload,
   FiFileText, FiImage, FiCheck, FiAlertCircle,
-  FiLoader, FiX, FiClipboard,
+  FiLoader, FiX, FiClipboard, FiLock,
 } from 'react-icons/fi';
 import { downloadBulkTemplate } from '../../lib/excel';
 import BulkUpload from './BulkUpload';
-import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../../lib/firebase';
 import { uploadStudentPhoto, generateApplicationNumber } from '../../lib/cloudinary';
 
@@ -32,6 +32,25 @@ const RegisterStudents = ({ schoolInfo }) => {
   const [successInfo, setSuccessInfo] = useState(null); // { applicationNumber, photoUrl }
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [studentRegistrationsOpen, setStudentRegistrationsOpen] = useState(true);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      doc(firestore, 'settings', 'platformControls'),
+      (snap) => {
+        const data = snap.exists() ? snap.data() : {};
+        setStudentRegistrationsOpen(data.studentRegistrationsOpen !== false); // Default true
+        setLoadingSettings(false);
+      },
+      () => {
+        setStudentRegistrationsOpen(true);
+        setLoadingSettings(false);
+      }
+    );
+    return unsubscribe;
+  }, []);
 
   // ── Derived application number (shown live as teacher types) ─────────────
   const applicationNumber =
@@ -188,6 +207,34 @@ const RegisterStudents = ({ schoolInfo }) => {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingSettings) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <FiLoader className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  if (!studentRegistrationsOpen) {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="mb-10">
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Register Students</h2>
+          <p className="text-slate-600 font-medium">Add individual students or bulk upload your entire class roster.</p>
+        </div>
+        <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-3xl p-12 text-center shadow-sm max-w-2xl mx-auto mt-10">
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FiLock className="w-8 h-8 text-slate-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 mb-3">Registrations Closed</h3>
+          <p className="text-slate-500 text-lg">
+            Student registrations are currently closed. If you need to make changes, please contact the administrators.
+          </p>
         </div>
       </div>
     );
