@@ -12,8 +12,8 @@
  * @returns {Promise<string>}      - Secure Cloudinary URL
  */
 export async function uploadStudentPhoto(file, udise, applicationNumber) {
-  const CLOUD_NAME = 'vmolujqx';
-  const UPLOAD_PRESET = 'kbe2026';
+  const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
   const PUBLIC_ID = `kbe2026/${udise}/${applicationNumber}`;
 
   const formData = new FormData();
