@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Hall ticket PDFs — any authenticated user can read (school coordinators + admins)
+    // Only authenticated users can write (admins uploading generated PDFs)
+    match /halltickets/{udise}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Student photos — authenticated users can read; only owner school can write
+    match /kbe2026/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+  }
+}

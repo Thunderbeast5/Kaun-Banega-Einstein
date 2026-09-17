@@ -1,88 +1,47 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   FiCheckCircle, FiClock, FiFileText, FiEye, FiX,
   FiZap, FiGlobe, FiRefreshCw, FiAlertCircle, FiDownload,
 } from 'react-icons/fi';
-import ReactDOM from 'react-dom/client';
-import html2canvas from 'html2canvas-pro';
-import jsPDF from 'jspdf';
 import {
   collection, doc, getDocs, getCountFromServer,
   orderBy, query, updateDoc,
 } from 'firebase/firestore';
 import { firestore } from '../../lib/firebase';
-import { uploadHallTicketPDF } from '../../lib/cloudinary';
-import HallTicketPage from '../HallTicketPage';
+import { generateSchoolPDF, downloadBlob } from '../../lib/generatePDF.jsx';
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 const StatusBadge = ({ status }) => {
-  const map = {
+  const styles = {
     'not-generated': 'bg-amber-100 text-amber-700',
-    'generated': 'bg-blue-100 text-blue-700',
-    'published': 'bg-green-100 text-green-700',
+    'generated':     'bg-blue-100 text-blue-700',
+    'published':     'bg-green-100 text-green-700',
   };
-  const label = {
+  const labels = {
     'not-generated': 'Not Generated',
-    'generated': 'Generated',
-    'published': 'Published',
+    'generated':     'Generated',
+    'published':     'Published',
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${map[status] ?? 'bg-slate-100 text-slate-600'}`}>
-      {label[status] ?? status}
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${styles[status] ?? 'bg-slate-100 text-slate-600'}`}>
+      {labels[status] ?? status}
     </span>
   );
 };
 
-// ─── Renders ONE hall ticket page off-screen and returns a canvas ─────────────
-async function renderTicketCanvas(studentData) {
-  return new Promise((resolve, reject) => {
-    const container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:-9999px;z-index:-1;';
-    document.body.appendChild(container);
-
-    const root = ReactDOM.createRoot(container);
-    root.render(<HallTicketPage studentData={studentData} />);
-
-    // Give React a frame to paint, then capture
-    requestAnimationFrame(async () => {
-      await new Promise(r => setTimeout(r, 200)); // let images load
-      try {
-        const el = container.firstElementChild;
-        const canvas = await html2canvas(el, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: '#ffffff',
-          logging: false,
-          width: 794,
-          height: 1123,
-          windowWidth: 794,
-          windowHeight: 1123,
-        });
-        resolve(canvas);
-      } catch (err) {
-        reject(err);
-      } finally {
-        root.unmount();
-        document.body.removeChild(container);
-      }
-    });
-  });
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main component ───────────────────────────────────────────────────────────
 const AdminTickets = () => {
-  const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [generatingId, setGeneratingId] = useState(null); // udise being generated
+  const [schools, setSchools]           = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [generatingId, setGeneratingId] = useState(null);
   const [publishingId, setPublishingId] = useState(null);
-  const [progress, setProgress] = useState({ current: 0, total: 0, name: '' });
-  const [previewUrl, setPreviewUrl] = useState(null);     // viewUrl — for Google Docs viewer preview
-  const [previewDownload, setPreviewDownload] = useState(null); // downloadUrl — for the Download button
-  const [previewSchool, setPreviewSchool] = useState(null);
-  const [toast, setToast] = useState(null); // { type: 'success'|'error', msg }
+  const [progress, setProgress]         = useState({ current: 0, total: 0, name: '' });
+  // In-session blob URLs: { [udise]: { blobUrl, count } }
+  // These live only until page refresh — that's intentional (no cloud storage).
+  const [sessionPDFs, setSessionPDFs]   = useState({});
+  const [toast, setToast]               = useState(null);
 
-  // ── Load schools from Firestore ─────────────────────────────────────────────
+  // ── Load schools ────────────────────────────────────────────────────────────
   const loadSchools = useCallback(async () => {
     setLoading(true);
     try {
@@ -93,27 +52,20 @@ const AdminTickets = () => {
           const udise = String(d.udiseNumber || schoolDoc.id);
           const rosterRef = collection(firestore, 'students', udise, 'roster');
           const countSnap = await getCountFromServer(rosterRef);
-
-          let status = 'not-generated';
-          if (d.hallTicketPublished && d.hallTicketUrl) status = 'published';
-          else if (d.hallTicketUrl) status = 'generated';
-
           return {
             id: schoolDoc.id,
             udise,
             name: d.schoolName || d.school_name || 'Unknown School',
             region: d.taluka || d.region || '—',
             count: countSnap.data().count || 0,
-            status,
-            hallTicketUrl: d.hallTicketUrl || null,
-            hallTicketDownloadUrl: d.hallTicketDownloadUrl || d.hallTicketUrl || null,
+            published: !!d.hallTicketPublished,
           };
         })
       );
       setSchools(list.sort((a, b) => b.count - a.count));
     } catch (err) {
       console.error('Failed to load schools:', err);
-      showToast('error', 'Failed to load schools. Check console.');
+      showToast('error', 'Failed to load schools.');
     } finally {
       setLoading(false);
     }
@@ -127,69 +79,46 @@ const AdminTickets = () => {
     setTimeout(() => setToast(null), 5000);
   };
 
-  // ── Generate bulk PDF for a school ─────────────────────────────────────────
+  // ── Derive display status for a school ─────────────────────────────────────
+  const getStatus = (school) => {
+    if (school.published) return 'published';
+    if (sessionPDFs[school.udise]) return 'generated';
+    return 'not-generated';
+  };
+
+  // ── Generate PDF ────────────────────────────────────────────────────────────
   const handleGenerate = async (school) => {
     setGeneratingId(school.udise);
     setProgress({ current: 0, total: 0, name: school.name });
 
     try {
-      // 1. Fetch all students
+      // 1. Fetch students
       const rosterRef = collection(firestore, 'students', school.udise, 'roster');
       const q = query(rosterRef, orderBy('registeredAt', 'asc'));
       const snap = await getDocs(q);
       const students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
       if (students.length === 0) {
-        showToast('error', `No students found for ${school.name}.`);
+        showToast('error', `No students registered for ${school.name}.`);
         return;
       }
 
       setProgress({ current: 0, total: students.length, name: school.name });
 
-      // 2. Create jsPDF (A4 portrait)
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfW = 210, pdfH = 297;
+      // 2. Generate PDF in-browser
+      const { blobUrl } = await generateSchoolPDF(
+        students,
+        school.name,
+        (current, total) => setProgress(prev => ({ ...prev, current, total }))
+      );
 
-      for (let i = 0; i < students.length; i++) {
-        const s = students[i];
-        const studentData = {
-          name: s.name,
-          school: s.schoolName || school.name,
-          grade: s.grade,
-          division: s.division,
-          rollNumber: s.rollNumber,
-          applicationNumber: s.applicationNumber || s.id,
-          photoUrl: s.photoUrl || null,
-        };
+      // 3. Auto-download
+      downloadBlob(blobUrl, `HallTickets_${school.name.replace(/\s+/g, '_')}.pdf`);
 
-        const canvas = await renderTicketCanvas(studentData);
-        const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      // 4. Store blob URL for this session (for Preview button)
+      setSessionPDFs(prev => ({ ...prev, [school.udise]: { blobUrl, count: students.length } }));
 
-        if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH, undefined, 'FAST');
-
-        setProgress(prev => ({ ...prev, current: i + 1 }));
-      }
-
-      // 3. Get blob and upload to Cloudinary
-      const pdfBlob = pdf.output('blob');
-      const { viewUrl, downloadUrl } = await uploadHallTicketPDF(pdfBlob, school.udise);
-
-      // 4. Write both URLs back to Firestore (not published yet)
-      await updateDoc(doc(firestore, 'schools', school.id), {
-        hallTicketUrl: viewUrl,
-        hallTicketDownloadUrl: downloadUrl,
-        hallTicketPublished: false,
-        hallTicketGeneratedAt: new Date().toISOString(),
-      });
-
-      // 5. Update local state
-      setSchools(prev => prev.map(sc =>
-        sc.id === school.id
-          ? { ...sc, status: 'generated', hallTicketUrl: viewUrl, hallTicketDownloadUrl: downloadUrl }
-          : sc
-      ));
-      showToast('success', `✅ ${students.length} tickets generated for ${school.name}`);
+      showToast('success', `✅ ${students.length} hall tickets downloaded for ${school.name}`);
     } catch (err) {
       console.error('Generation failed:', err);
       showToast('error', `Generation failed: ${err.message}`);
@@ -199,15 +128,16 @@ const AdminTickets = () => {
     }
   };
 
-  // ── Publish a school's PDF ──────────────────────────────────────────────────
+  // ── Publish ─────────────────────────────────────────────────────────────────
   const handlePublish = async (school) => {
     setPublishingId(school.udise);
     try {
       await updateDoc(doc(firestore, 'schools', school.id), {
         hallTicketPublished: true,
+        hallTicketPublishedAt: new Date().toISOString(),
       });
       setSchools(prev => prev.map(sc =>
-        sc.id === school.id ? { ...sc, status: 'published' } : sc
+        sc.id === school.id ? { ...sc, published: true } : sc
       ));
       showToast('success', `🌐 Hall tickets published for ${school.name}`);
     } catch (err) {
@@ -217,11 +147,30 @@ const AdminTickets = () => {
     }
   };
 
-  // ─── Derived stats ──────────────────────────────────────────────────────────
-  const totalGenerated = schools.filter(s => s.status === 'generated' || s.status === 'published').length;
-  const totalPublished = schools.filter(s => s.status === 'published').length;
+  // ── Unpublish (re-lock) ─────────────────────────────────────────────────────
+  const handleUnpublish = async (school) => {
+    setPublishingId(school.udise);
+    try {
+      await updateDoc(doc(firestore, 'schools', school.id), {
+        hallTicketPublished: false,
+      });
+      setSchools(prev => prev.map(sc =>
+        sc.id === school.id ? { ...sc, published: false } : sc
+      ));
+      showToast('success', `🔒 Hall tickets unpublished for ${school.name}`);
+    } catch (err) {
+      showToast('error', `Unpublish failed: ${err.message}`);
+    } finally {
+      setPublishingId(null);
+    }
+  };
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  // ── Stats ───────────────────────────────────────────────────────────────────
+  const totalGenerated = Object.keys(sessionPDFs).length;
+  const totalPublished = schools.filter(s => s.published).length;
+  const anyBusy = !!generatingId || !!publishingId;
+
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
 
@@ -230,20 +179,26 @@ const AdminTickets = () => {
         <div className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl text-sm font-bold transition-all ${
           toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
         }`}>
-          {toast.type === 'success' ? <FiCheckCircle className="w-5 h-5 shrink-0" /> : <FiAlertCircle className="w-5 h-5 shrink-0" />}
+          {toast.type === 'success'
+            ? <FiCheckCircle className="w-5 h-5 shrink-0" />
+            : <FiAlertCircle className="w-5 h-5 shrink-0" />}
           {toast.msg}
         </div>
       )}
 
-      {/* Generation Progress Banner */}
+      {/* Progress banner */}
       {generatingId && (
         <div className="mb-6 bg-blue-900 text-white rounded-2xl p-5 flex items-center gap-4 shadow-lg">
           <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
             <FiZap className="w-5 h-5 animate-pulse" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm truncate">Generating hall tickets for {progress.name}</p>
-            <p className="text-blue-200 text-xs mt-0.5">{progress.current} / {progress.total} tickets processed…</p>
+            <p className="font-bold text-sm truncate">
+              Generating hall tickets for {progress.name}
+            </p>
+            <p className="text-blue-200 text-xs mt-0.5">
+              {progress.current} / {progress.total} tickets processed…
+            </p>
             {progress.total > 0 && (
               <div className="mt-2 h-1.5 bg-white/20 rounded-full overflow-hidden">
                 <div
@@ -259,13 +214,17 @@ const AdminTickets = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Hall Tickets Master</h2>
-          <p className="text-slate-600 font-medium">Generate, preview and publish examination admit cards for all schools.</p>
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+            Hall Tickets Master
+          </h2>
+          <p className="text-slate-600 font-medium">
+            Generate &amp; download hall ticket PDFs per school, then publish to unlock coordinator downloads.
+          </p>
         </div>
         <button
           type="button"
           onClick={loadSchools}
-          disabled={loading}
+          disabled={loading || anyBusy}
           className="flex items-center gap-2 bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm disabled:opacity-50"
         >
           <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -273,12 +232,12 @@ const AdminTickets = () => {
         </button>
       </div>
 
-      {/* Stats Summary */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {[
-          { label: 'Total Schools', value: schools.length, bg: 'bg-blue-100', icon: <FiFileText className="w-5 h-5" />, color: 'text-blue-700' },
-          { label: 'PDFs Generated', value: totalGenerated, bg: 'bg-indigo-100', icon: <FiCheckCircle className="w-5 h-5" />, color: 'text-indigo-700' },
-          { label: 'Published to Schools', value: totalPublished, bg: 'bg-green-100', icon: <FiGlobe className="w-5 h-5" />, color: 'text-green-700' },
+          { label: 'Total Schools',       value: schools.length,  bg: 'bg-blue-100',   icon: <FiFileText className="w-5 h-5" />,    color: 'text-blue-700'   },
+          { label: 'Generated (session)', value: totalGenerated,  bg: 'bg-indigo-100', icon: <FiCheckCircle className="w-5 h-5" />, color: 'text-indigo-700' },
+          { label: 'Published to Schools',value: totalPublished,  bg: 'bg-green-100',  icon: <FiGlobe className="w-5 h-5" />,       color: 'text-green-700'  },
         ].map(({ label, value, bg, icon, color }) => (
           <div key={label} className={`relative rounded-[2rem] border border-white/60 shadow-sm ${bg} overflow-hidden`}>
             <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
@@ -295,7 +254,7 @@ const AdminTickets = () => {
         ))}
       </div>
 
-      {/* Main Table */}
+      {/* Table */}
       <div className="relative rounded-[2rem] border border-white/60 shadow-sm bg-blue-50 overflow-hidden">
         <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
         <div className="relative z-10 p-4 sm:p-8">
@@ -306,10 +265,12 @@ const AdminTickets = () => {
               ))}
             </div>
           ) : schools.length === 0 ? (
-            <div className="text-center py-20 text-slate-400 font-medium">No schools registered yet.</div>
+            <div className="text-center py-20 text-slate-400 font-medium">
+              No schools registered yet.
+            </div>
           ) : (
             <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white shadow-sm">
-              <table className="w-full text-left border-collapse min-w-[800px]">
+              <table className="w-full text-left border-collapse min-w-[820px]">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
                     {['School', 'Region', 'Students', 'Status', 'Actions'].map(col => (
@@ -321,9 +282,11 @@ const AdminTickets = () => {
                 </thead>
                 <tbody className="text-sm">
                   {schools.map((school) => {
+                    const status       = getStatus(school);
                     const isGenerating = generatingId === school.udise;
                     const isPublishing = publishingId === school.udise;
-                    const anyBusy = !!generatingId || !!publishingId;
+                    const hasSessionPDF = !!sessionPDFs[school.udise];
+
                     return (
                       <tr key={school.id} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
                         <td className="py-4 px-5">
@@ -337,12 +300,12 @@ const AdminTickets = () => {
                           </span>
                         </td>
                         <td className="py-4 px-5">
-                          <StatusBadge status={school.status} />
+                          <StatusBadge status={status} />
                         </td>
                         <td className="py-4 px-5">
                           <div className="flex items-center justify-end gap-2 flex-wrap">
 
-                            {/* GENERATE button */}
+                            {/* DOWNLOAD / RE-DOWNLOAD */}
                             <button
                               type="button"
                               onClick={() => handleGenerate(school)}
@@ -350,21 +313,17 @@ const AdminTickets = () => {
                               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               {isGenerating ? (
-                                <><FiRefreshCw className="w-3 h-3 animate-spin" /> Generating…</>
+                                <><FiRefreshCw className="w-3 h-3 animate-spin" /> Downloading…</>
                               ) : (
-                                <><FiZap className="w-3 h-3" /> {school.hallTicketUrl ? 'Re-generate' : 'Generate'}</>
+                                <><FiDownload className="w-3 h-3" /> {hasSessionPDF ? 'Re-download' : 'Download'}</>
                               )}
                             </button>
 
-                            {/* PREVIEW button — only if URL exists */}
-                            {school.hallTicketUrl && (
+                            {/* PREVIEW — opens in new tab */}
+                            {hasSessionPDF && (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setPreviewUrl(school.hallTicketUrl);
-                                  setPreviewDownload(school.hallTicketDownloadUrl || school.hallTicketUrl);
-                                  setPreviewSchool(school.name);
-                                }}
+                                onClick={() => window.open(sessionPDFs[school.udise].blobUrl, '_blank')}
                                 disabled={anyBusy}
                                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 text-blue-700 font-bold hover:bg-blue-50 text-xs transition-colors shadow-sm disabled:opacity-40"
                               >
@@ -372,8 +331,8 @@ const AdminTickets = () => {
                               </button>
                             )}
 
-                            {/* PUBLISH button — only if generated but not published */}
-                            {(school.status === 'generated') && (
+                            {/* PUBLISH — if generated in session and not yet published */}
+                            {hasSessionPDF && !school.published && (
                               <button
                                 type="button"
                                 onClick={() => handlePublish(school)}
@@ -388,12 +347,21 @@ const AdminTickets = () => {
                               </button>
                             )}
 
-                            {/* Re-publish badge when already published */}
-                            {school.status === 'published' && (
-                              <span className="inline-flex items-center gap-1 text-green-700 font-bold text-xs">
-                                <FiCheckCircle className="w-3.5 h-3.5" /> Published
-                              </span>
+                            {/* UNPUBLISH — if already published */}
+                            {school.published && (
+                              <button
+                                type="button"
+                                onClick={() => handleUnpublish(school)}
+                                disabled={anyBusy}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 font-bold text-xs transition-colors shadow-sm disabled:opacity-40 border border-slate-200"
+                              >
+                                {isPublishing
+                                  ? <FiRefreshCw className="w-3 h-3 animate-spin" />
+                                  : <FiCheckCircle className="w-3.5 h-3.5 text-green-600" />}
+                                {isPublishing ? 'Updating…' : 'Published'}
+                              </button>
                             )}
+
                           </div>
                         </td>
                       </tr>
@@ -403,48 +371,16 @@ const AdminTickets = () => {
               </table>
             </div>
           )}
+
+          {/* Session notice */}
+          {!loading && totalGenerated > 0 && (
+            <p className="mt-4 text-xs text-slate-400 font-medium text-center">
+              Preview is only available in this browser session. Refresh the page and you'll need to re-generate to preview again.
+            </p>
+          )}
         </div>
       </div>
 
-      {/* PDF Preview Modal */}
-      {previewUrl && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 flex flex-col" role="dialog" aria-modal="true" aria-label="Hall ticket PDF preview">
-          <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
-            <div>
-              <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Preview — Hall Tickets PDF</p>
-              <p className="font-bold text-sm mt-0.5">{previewSchool}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Use downloadUrl (fl_attachment) so browser saves the file instead
-                  of Chrome's PDF viewer extension intercepting and returning 401 */}
-              <a
-                href={previewDownload || previewUrl}
-                download={`HallTickets_${previewSchool?.replace(/\s+/g, '_')}.pdf`}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-xs font-bold transition-colors"
-              >
-                <FiDownload className="w-3.5 h-3.5" /> Download PDF
-              </a>
-              <button
-                type="button"
-                onClick={() => { setPreviewUrl(null); setPreviewDownload(null); setPreviewSchool(null); }}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-                aria-label="Close preview"
-              >
-                <FiX className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden p-4">
-            {/* Cloudinary blocks direct iframe embedding (X-Frame-Options).
-                Google Docs viewer proxies the PDF and renders it inline. */}
-            <iframe
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewUrl)}&embedded=true`}
-              title="Hall Tickets PDF"
-              className="w-full h-full rounded-xl border border-white/10"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
