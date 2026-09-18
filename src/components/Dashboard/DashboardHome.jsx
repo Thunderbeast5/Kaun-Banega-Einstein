@@ -1,17 +1,56 @@
+import { useEffect, useState } from 'react';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { FiUsers, FiTrendingUp, FiFileText, FiCalendar } from 'react-icons/fi';
 import DashboardHomeSkeleton from './skeletons/DashboardHomeSkeleton';
+import { firestore } from '../../lib/firebase';
 
 const DashboardHome = ({ schoolInfo, loading }) => {
-  if (loading || !schoolInfo) return <DashboardHomeSkeleton />;
+  const [students, setStudents] = useState([]);
+  const [ticketsPublished, setTicketsPublished] = useState(false);
+  const [studentsLoading, setStudentsLoading] = useState(true);
 
-  const grade9Students = Number(schoolInfo.grade9Students || 0);
-  const grade10Students = Number(schoolInfo.grade10Students || 0);
-  const totalStudents = grade9Students + grade10Students;
+  useEffect(() => {
+    if (!schoolInfo?.udise) {
+      setStudentsLoading(false);
+      return undefined;
+    }
+
+    const rosterRef = collection(doc(firestore, 'students', String(schoolInfo.udise)), 'roster');
+    const schoolRef = doc(firestore, 'schools', String(schoolInfo.udise));
+
+    const unsubscribeRoster = onSnapshot(
+      rosterRef,
+      (snapshot) => {
+        setStudents(snapshot.docs.map((student) => student.data()));
+        setStudentsLoading(false);
+      },
+      (error) => {
+        console.error('Failed to load dashboard roster:', error);
+        setStudentsLoading(false);
+      },
+    );
+    const unsubscribeSchool = onSnapshot(
+      schoolRef,
+      (snapshot) => setTicketsPublished(snapshot.data()?.hallTicketPublished === true),
+      (error) => console.error('Failed to load ticket status:', error),
+    );
+
+    return () => {
+      unsubscribeRoster();
+      unsubscribeSchool();
+    };
+  }, [schoolInfo?.udise]);
+
+  if (loading || !schoolInfo || studentsLoading) return <DashboardHomeSkeleton />;
+
+  const grade9Students = students.filter((student) => /^(9|9th|grade\s*9)$/i.test(String(student.grade).trim())).length;
+  const grade10Students = students.filter((student) => /^(10|10th|grade\s*10)$/i.test(String(student.grade).trim())).length;
+  const totalStudents = students.length;
   const stats = [
     { title: 'Registered Students', value: totalStudents, icon: <FiUsers className="w-6 h-6 text-blue-700" />, theme: 'bg-blue-200' },
     { title: '9th Grade', value: grade9Students, icon: <FiTrendingUp className="w-6 h-6 text-slate-700" />, theme: 'bg-white' },
     { title: '10th Grade', value: grade10Students, icon: <FiTrendingUp className="w-6 h-6 text-slate-700" />, theme: 'bg-white' },
-    { title: 'Tickets Ready', value: '—', icon: <FiFileText className="w-6 h-6 text-blue-800" />, theme: 'bg-blue-400' },
+    { title: 'Tickets Ready', value: ticketsPublished ? totalStudents : 0, icon: <FiFileText className="w-6 h-6 text-blue-800" />, theme: 'bg-blue-400' },
   ];
 
   return (
