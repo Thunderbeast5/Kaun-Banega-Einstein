@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiHome, FiLayout, FiTarget, FiAward, FiGift, FiFileText } from 'react-icons/fi';
 import logo from '../assets/KBE.png';
 import { auth, firestore } from '../lib/firebase';
@@ -16,6 +16,7 @@ const Navbar = ({ forceDarkText = false }) => {
   // Track active tab for mobile/tablet bottom nav
   const [activeMobileTab, setActiveMobileTab] = useState('about');
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Scroll behaviour for the TOP navbar ONLY
   useEffect(() => {
@@ -83,12 +84,12 @@ const Navbar = ({ forceDarkText = false }) => {
 
   // Dynamically build mobile/tablet bottom nav links without Auth
   const mobileNavLinks = [
-    { id: 'about', path: '#about', label: 'Home', icon: FiHome },
+    { id: 'about', path: '/', label: 'Home', icon: FiHome },
     { id: 'structure', path: '#structure', label: 'Structure', icon: FiLayout },
-    { id: 'prizes', path: '#isro-prize', label: 'Prizes', icon: FiGift },
     resultsVisible
       ? { id: 'results', path: '/results', label: 'Results', icon: FiAward }
       : { id: 'rocket', path: '#rocket-launch', label: 'Rocket', icon: FiTarget },
+    { id: 'prizes', path: '#isro-prize', label: 'Prizes', icon: FiGift },
   ];
 
   // Conditionally add Certificates to mobile/tablet nav if active
@@ -98,9 +99,17 @@ const Navbar = ({ forceDarkText = false }) => {
 
   const handleMobileNavClick = (id, path) => {
     setActiveMobileTab(id);
+    if (path === '/') {
+      if (location.pathname !== '/') {
+        navigate('/');
+      }
+      window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      return;
+    }
+
     if (path.startsWith('#')) {
       if (location.pathname !== '/') {
-        window.location.href = `/${path}`;
+        navigate(`/${path}`);
       } else {
         const element = document.querySelector(path);
         if (element) element.scrollIntoView({ behavior: 'smooth' });
@@ -188,7 +197,13 @@ const Navbar = ({ forceDarkText = false }) => {
         {/* Sky Blue themed capsule */}
         <nav className="pointer-events-auto flex items-center gap-1 sm:gap-2 bg-blue-100/90 backdrop-blur-md p-1.5 rounded-full shadow-[0_8px_30px_rgba(29,78,216,0.15)] border border-blue-200/60">
           {mobileNavLinks.map((item) => {
-            const isActive = activeMobileTab === item.id;
+            const routeTab = {
+              '/results': 'results',
+              '/certificate': 'certificate',
+            }[location.pathname];
+            const isActive = routeTab
+              ? routeTab === item.id
+              : activeMobileTab === item.id;
             const Icon = item.icon;
             
             const buttonClass = `transition-all duration-300 ease-in-out flex items-center justify-center whitespace-nowrap ${
@@ -210,7 +225,7 @@ const Navbar = ({ forceDarkText = false }) => {
               <Link
                 key={item.id}
                 to={item.path}
-                onClick={() => setActiveMobileTab(item.id)}
+                onClick={() => handleMobileNavClick(item.id, item.path)}
                 className={buttonClass}
               >
                 <Icon className={isActive ? "w-4 h-4" : "w-5 h-5"} />

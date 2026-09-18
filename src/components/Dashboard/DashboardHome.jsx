@@ -11,7 +11,6 @@ const DashboardHome = ({ schoolInfo, loading }) => {
 
   useEffect(() => {
     if (!schoolInfo?.udise) {
-      setStudentsLoading(false);
       return undefined;
     }
 
