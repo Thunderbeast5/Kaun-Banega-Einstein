@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import heroImage from '../assets/hero.webp';
+import mobileHeroImage from '../assets/mob.webp';
 
 const Hero = () => {
   return (
@@ -8,7 +9,11 @@ const Hero = () => {
       style={{ fontFamily: '"Poppins", sans-serif' }}
     >
       <div
-        className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat md:hidden"
+        style={{ backgroundImage: `url(${mobileHeroImage})` }}
+      />
+      <div
+        className="absolute inset-0 -z-20 hidden bg-cover bg-center bg-no-repeat md:block"
         style={{ backgroundImage: `url(${heroImage})` }}
       />
       <div 
@@ -22,13 +27,13 @@ const Hero = () => {
         className="max-w-2xl"
       >
         <h1
-          className="text-5xl md:text-7xl font-extrabold leading-tight mb-2 drop-shadow-lg text-white whitespace-nowrap"
+          className="mb-2 text-4xl font-extrabold leading-tight text-white drop-shadow-lg sm:text-5xl md:text-7xl"
           style={{ fontFamily: '"Playfair Display", serif' }}
         >
           Step Into the Cosmos.
         </h1>
         <h2
-          className="text-4xl md:text-5xl italic mb-6 text-white-300 drop-shadow-md whitespace-nowrap"
+          className="mb-6 text-3xl italic text-white-300 drop-shadow-md sm:text-4xl md:text-5xl"
           style={{ fontFamily: '"Playfair Display", serif' }}
         >
           Master the Art of Science.
