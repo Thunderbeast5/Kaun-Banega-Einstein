@@ -69,6 +69,44 @@ const Navbar = ({ forceDarkText = false }) => {
     return unsubscribe;
   }, []);
 
+  // Keep the mobile bottom-nav selection in sync with the visible home section.
+  useEffect(() => {
+    if (location.pathname !== '/') return undefined;
+
+    const sectionTabs = [
+      ['about', 'about'],
+      ['structure', 'structure'],
+      ['prizes', 'isro-prize'],
+      ...(!resultsVisible ? [['rocket', 'rocket-launch']] : []),
+    ];
+    const visibleSections = new Map();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            visibleSections.set(entry.target.id, entry.intersectionRatio);
+          } else {
+            visibleSections.delete(entry.target.id);
+          }
+        });
+
+        const mostVisible = [...visibleSections.entries()].sort((a, b) => b[1] - a[1])[0];
+        if (mostVisible) {
+          const activeTab = sectionTabs.find(([, sectionId]) => sectionId === mostVisible[0]);
+          if (activeTab) setActiveMobileTab(activeTab[0]);
+        }
+      },
+      { rootMargin: '-20% 0px -55% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+
+    sectionTabs.forEach(([, sectionId]) => {
+      const section = document.getElementById(sectionId);
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [location.pathname, resultsVisible]);
+
   // Dynamically build center navigation links for Desktop
   const navLinks = [
     { path: '#about', label: 'About' },
@@ -108,13 +146,18 @@ const Navbar = ({ forceDarkText = false }) => {
     }
 
     if (path.startsWith('#')) {
-      if (location.pathname !== '/') {
-        navigate(`/${path}`);
-      } else {
-        const element = document.querySelector(path);
-        if (element) element.scrollIntoView({ behavior: 'smooth' });
-      }
+      navigateToSection(path);
     }
+  };
+
+  const navigateToSection = (path) => {
+    if (location.pathname !== '/') {
+      navigate(`/${path}`);
+      return;
+    }
+
+    const element = document.querySelector(path);
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -167,7 +210,15 @@ const Navbar = ({ forceDarkText = false }) => {
             {navLinks.map(({ path, label }) => {
               const className = `${isScrolled || forceDarkText ? 'text-slate-900 hover:text-blue-700' : 'text-white drop-shadow-md hover:text-yellow-400'} transition-colors duration-300 cursor-pointer`;
               return path.startsWith('#') ? (
-                <a key={path} href={path} className={className}>
+                <a
+                  key={path}
+                  href={path}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    navigateToSection(path);
+                  }}
+                  className={className}
+                >
                   {label}
                 </a>
               ) : (
