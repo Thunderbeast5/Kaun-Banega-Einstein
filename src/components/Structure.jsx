@@ -84,7 +84,7 @@ const Structure = () => {
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-6 md:mb-8">
                     {step.workflow.map((item, i) => (
                       <React.Fragment key={i}>
-                        <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/70 border border-white text-xs sm:text-sm font-semibold text-blue-800 shadow-sm whitespace-nowrap">
+                        <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/70 border border-white text-xs sm:text-sm font-semibold text-blue-800 shadow-sm text-center leading-tight">
                           {item}
                         </span>
                         {i < step.workflow.length - 1 && (
@@ -116,8 +116,8 @@ const Structure = () => {
               </div>
             </div>
             <div className="flex-1 pt-1 md:pt-3">
-               <div className="inline-flex items-center gap-4 px-5 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl bg-white border border-slate-200 shadow-sm">
-                  <span className="text-slate-800 font-medium text-xs sm:text-sm md:text-base">
+              <div className="inline-flex max-w-full items-center gap-4 px-5 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <span className="text-slate-800 font-medium text-xs sm:text-sm md:text-base break-words">
                     Final Evaluation leads to the prestigious final ranking, determining the ultimate winners.
                   </span>
                </div>

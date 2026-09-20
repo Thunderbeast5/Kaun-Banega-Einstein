@@ -71,11 +71,11 @@ const ISROPrize = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3 md:gap-4">
                 <div className="flex items-center gap-2.5 md:gap-3 bg-blue-100/80 border border-white/60 px-4 py-2.5 md:px-5 md:py-3 rounded-xl shadow-sm w-full sm:w-auto justify-center md:justify-start">
                   <FiUsers className="w-4 h-4 md:w-5 md:h-5 text-blue-700 flex-shrink-0" />
-                  <span className="text-slate-800 font-semibold text-xs sm:text-sm whitespace-nowrap">Top 3 Students + Mentors</span>
+                  <span className="text-slate-800 font-semibold text-xs sm:text-sm text-center leading-tight">Top 3 Students + Mentors</span>
                 </div>
                 <div className="flex items-center gap-2.5 md:gap-3 bg-blue-100/80 border border-white/60 px-4 py-2.5 md:px-5 md:py-3 rounded-xl shadow-sm w-full sm:w-auto justify-center md:justify-start">
                   <FiAward className="w-4 h-4 md:w-5 md:h-5 text-blue-700 flex-shrink-0" />
-                  <span className="text-slate-800 font-semibold text-xs sm:text-sm whitespace-nowrap">Fully Sponsored Trip</span>
+                  <span className="text-slate-800 font-semibold text-xs sm:text-sm text-center leading-tight">Fully Sponsored Trip</span>
                 </div>
               </div>
             </div>
