@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import Navbar from '../components/Navbar';
 import GenerateCertificate from '../components/GenerateCertificate';
-import { collectionGroup, query, where, getDocs } from 'firebase/firestore';
+import { collectionGroup, query, where, getDocs, collection } from 'firebase/firestore';
 import { firestore } from '../lib/firebase';
 
 const CertificatePortal = () => {
@@ -26,19 +26,32 @@ const CertificatePortal = () => {
     setStatus('loading');
     
     try {
-      const q = query(
+      const appNum = formData.id.trim().toUpperCase();
+      let snapshot = await getDocs(query(
         collectionGroup(firestore, 'roster'),
-        where('applicationNumber', '==', formData.id.trim().toUpperCase()),
+        where('applicationNumber', '==', appNum),
         where('dob', '==', formData.dob)
-      );
+      ));
       
-      const snapshot = await getDocs(q);
-      
+      let studentDoc = null;
+
       if (!snapshot.empty) {
-        const studentDoc = snapshot.docs[0].data();
+        studentDoc = snapshot.docs[0].data();
+      } else {
+        const indSnapshot = await getDocs(query(
+          collection(firestore, 'individual_students'),
+          where('applicationNumber', '==', appNum),
+          where('dob', '==', formData.dob)
+        ));
+        if (!indSnapshot.empty) {
+          studentDoc = indSnapshot.docs[0].data();
+        }
+      }
+      
+      if (studentDoc) {
         setStudentData({
           name: studentDoc.name,
-          school: studentDoc.schoolName,
+          school: studentDoc.schoolName || studentDoc.school || 'Unknown School',
           rank: studentDoc.rank || 'Participant',
           score: studentDoc.score || 'N/A',
           applicationNumber: studentDoc.applicationNumber

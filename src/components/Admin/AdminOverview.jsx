@@ -15,8 +15,9 @@ const AdminOverview = ({ setActiveTab }) => {
     setIsExporting(true);
     try {
       const rosterSnapshot = await getDocs(collectionGroup(firestore, 'roster'));
+      const indSnapshot = await getDocs(collection(firestore, 'individual_students'));
       
-      if (rosterSnapshot.empty) {
+      if (rosterSnapshot.empty && indSnapshot.empty) {
         alert("No students found in the database.");
         setIsExporting(false);
         return;
@@ -40,6 +41,26 @@ const AdminOverview = ({ setActiveTab }) => {
           "Rank": data.rank || '',
           "Score": data.score || '',
           "Registered At": data.registeredAt?.toDate ? data.registeredAt.toDate().toLocaleString() : ''
+        });
+      });
+
+      indSnapshot.forEach((doc) => {
+        const data = doc.data();
+        students.push({
+          "Application Number": data.applicationNumber || '',
+          "Roll Number": data.rollNo || '',
+          "Student Name": data.name || '',
+          "Date of Birth": data.dob || '',
+          "Grade": data.grade || '',
+          "Division": data.division || '',
+          "School UDISE": data.udise || '',
+          "School Name": data.school || data.schoolName || '',
+          "Parent Name": data.parentName || '',
+          "Relation": data.relation || '',
+          "Mobile Number": data.phone || data.mobile || '',
+          "Rank": data.rank || '',
+          "Score": data.score || '',
+          "Registered At": data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString() : ''
         });
       });
 
@@ -96,6 +117,11 @@ const AdminOverview = ({ setActiveTab }) => {
             totalStudents += studentCountSnapshot.data().count || 0;
           }),
         );
+
+        // Add individual students count
+        const indRef = collection(firestore, 'individual_students');
+        const indSnapshot = await getCountFromServer(indRef);
+        totalStudents += indSnapshot.data().count || 0;
 
         if (!isMounted) return;
 
