@@ -139,7 +139,7 @@ const HallTicket = ({ studentData }) => {
                 </div>
                 <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
                   <span className="w-32 font-bold text-slate-700">Roll No.</span>
-                  <span className="font-bold text-slate-900 pl-4">{studentData?.rollNo || '45-A'}</span>
+                  <span className="font-bold text-slate-900 pl-4">{studentData?.rollNumber || studentData?.rollNo || '45-A'}</span>
                 </div>
                 <div className="flex items-end border-b border-dashed border-slate-300 pb-1">
                   <span className="w-32 font-bold text-slate-700">Application No.</span>
@@ -148,9 +148,20 @@ const HallTicket = ({ studentData }) => {
               </div>
 
               {/* Photo Box */}
-              <div className="w-[120px] h-[150px] border-2 border-slate-400 border-dashed rounded-lg flex flex-col items-center justify-center bg-slate-50 shrink-0 text-center p-2">
-                <FiUser className="w-12 h-12 text-slate-300 mb-2" />
-                <span className="text-[10px] text-slate-400 font-bold">Paste Passport<br/>Size Photo Here</span>
+              <div className="w-[120px] h-[150px] border-2 border-slate-400 border-dashed rounded-lg flex flex-col items-center justify-center bg-slate-50 shrink-0 text-center p-2 overflow-hidden">
+                {studentData?.photoUrl ? (
+                  <img
+                    src={studentData.photoUrl}
+                    alt="Candidate"
+                    crossOrigin="anonymous"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <FiUser className="w-12 h-12 text-slate-300 mb-2" />
+                    <span className="text-[10px] text-slate-400 font-bold">Paste Passport<br/>Size Photo Here</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

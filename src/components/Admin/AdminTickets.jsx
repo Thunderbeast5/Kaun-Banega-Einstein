@@ -5,7 +5,7 @@ import {
 } from 'react-icons/fi';
 import {
   collection, doc, getDocs, getDoc, setDoc, getCountFromServer,
-  orderBy, query, updateDoc,
+  orderBy, query, updateDoc, where
 } from 'firebase/firestore';
 import { firestore } from '../../lib/firebase';
 import { generateSchoolPDF, downloadBlob } from '../../lib/generatePDF.jsx';
@@ -63,20 +63,33 @@ const AdminTickets = () => {
         })
       );
 
-      // Add Individual Students as a pseudo-school
-      const indSnap = await getCountFromServer(collection(firestore, 'individual_students'));
-      const indCount = indSnap.data().count || 0;
-      if (indCount > 0) {
+      // Add Individual Students grouped by school
+      const indRef = collection(firestore, 'individual_students');
+      const indSnapshot = await getDocs(indRef);
+      if (!indSnapshot.empty) {
         const settingsDoc = await getDoc(doc(firestore, 'settings', 'individual_controls'));
         const indPublished = settingsDoc.exists() ? !!settingsDoc.data().hallTicketPublished : false;
-        list.push({
-          id: 'individuals',
-          udise: 'INDIVIDUALS',
-          name: 'Individual Registrations',
-          region: 'Global',
-          count: indCount,
-          published: indPublished,
-          isIndividual: true,
+        
+        const indSchoolsMap = new Map();
+        indSnapshot.forEach(docSnap => {
+          const student = docSnap.data();
+          const udise = student.udise || 'UNKNOWN';
+          if (!indSchoolsMap.has(udise)) {
+            indSchoolsMap.set(udise, {
+              id: `ind_${udise}`,
+              udise: udise,
+              name: student.school || 'Unknown School',
+              region: 'Individual', // used as placeholder
+              count: 0,
+              published: indPublished,
+              isIndividual: true,
+            });
+          }
+          indSchoolsMap.get(udise).count += 1;
+        });
+
+        indSchoolsMap.forEach(indSchool => {
+          list.push(indSchool);
         });
       }
 
@@ -114,7 +127,8 @@ const AdminTickets = () => {
       let students = [];
       if (school.isIndividual) {
         const indRef = collection(firestore, 'individual_students');
-        const indSnap = await getDocs(query(indRef, orderBy('createdAt', 'asc')));
+        const q = query(indRef, where('udise', '==', school.udise), orderBy('createdAt', 'asc'));
+        const indSnap = await getDocs(q);
         students = indSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       } else {
         const rosterRef = collection(firestore, 'students', school.udise, 'roster');
@@ -328,7 +342,14 @@ const AdminTickets = () => {
                     return (
                       <tr key={school.id} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
                         <td className="py-4 px-5">
-                          <p className="font-bold text-slate-900">{school.name}</p>
+                          <p className="font-bold text-slate-900 flex items-center gap-2">
+                            {school.name}
+                            {school.isIndividual && (
+                              <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                Individual
+                              </span>
+                            )}
+                          </p>
                           <p className="font-mono text-xs text-slate-500 mt-0.5">UDISE: {school.udise}</p>
                         </td>
                         <td className="py-4 px-5 font-medium text-slate-700">{school.region}</td>

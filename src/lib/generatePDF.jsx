@@ -72,7 +72,7 @@ export async function generateSchoolPDF(students, schoolName, onProgress) {
       school: s.schoolName || schoolName,
       grade: s.grade || '',
       division: s.division || '',
-      rollNumber: s.rollNumber || '—',
+      rollNumber: s.rollNumber || s.rollNo || '—',
       applicationNumber: s.applicationNumber || s.id,
       photoUrl: s.photoUrl || null,
     };

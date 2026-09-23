@@ -25,10 +25,7 @@ const StudentDashboard = () => {
         const studentDoc = await getDoc(doc(firestore, 'individual_students', user.uid));
         if (studentDoc.exists()) {
           const data = studentDoc.data();
-          setStudentData({
-            ...data,
-            rollNo: 'IND', // Placeholder for individuals
-          });
+          setStudentData(data);
         }
 
         // Check if hall tickets are published

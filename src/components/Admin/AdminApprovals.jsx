@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  collection, doc, getDocs, getCountFromServer, orderBy, query,
+  collection, doc, getDocs, getCountFromServer, orderBy, query, where
 } from 'firebase/firestore';
 import { FiUsers, FiArrowLeft, FiSearch, FiFilter } from 'react-icons/fi';
 import { firestore } from '../../lib/firebase';
@@ -17,9 +17,16 @@ const StudentPanel = ({ school, onBack }) => {
     let isMounted = true;
     const load = async () => {
       try {
-        const rosterRef = collection(doc(firestore, 'students', String(school.id)), 'roster');
-        const q = query(rosterRef, orderBy('registeredAt', 'desc'));
-        const snap = await getDocs(q);
+        let snap;
+        if (school.isIndividual) {
+          const indRef = collection(firestore, 'individual_students');
+          const q = query(indRef, where('udise', '==', school.id), orderBy('createdAt', 'desc'));
+          snap = await getDocs(q);
+        } else {
+          const rosterRef = collection(doc(firestore, 'students', String(school.id)), 'roster');
+          const q = query(rosterRef, orderBy('registeredAt', 'desc'));
+          snap = await getDocs(q);
+        }
         if (isMounted) setStudents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (err) {
         console.error('Failed to load students:', err);
@@ -133,7 +140,7 @@ const StudentPanel = ({ school, onBack }) => {
                         )}
                       </td>
                       <td className="py-3.5 px-5 text-slate-600 font-medium">
-                        {student.mobile ? `+91 ${student.mobile}` : '—'}
+                        {(student.mobile || student.phone) ? `+91 ${student.mobile || student.phone}` : '—'}
                       </td>
                     </tr>
                   )) : (
@@ -199,6 +206,31 @@ const AdminApprovals = () => {
           }),
         );
 
+        // Add Individual Students grouped by school
+        const indRef = collection(firestore, 'individual_students');
+        const indSnapshot = await getDocs(indRef);
+        if (!indSnapshot.empty) {
+          const indSchoolsMap = new Map();
+          indSnapshot.forEach(docSnap => {
+            const student = docSnap.data();
+            const udise = student.udise || 'UNKNOWN';
+            if (!indSchoolsMap.has(udise)) {
+              indSchoolsMap.set(udise, {
+                id: udise,
+                name: student.school || 'Unknown School',
+                students: 0,
+                principalName: 'Individual Registration',
+                principalPhone: '—',
+                coordinatorName: '—',
+                coordinatorPhone: '—',
+                isIndividual: true,
+              });
+            }
+            indSchoolsMap.get(udise).students += 1;
+          });
+          indSchoolsMap.forEach(indSchool => schools.push(indSchool));
+        }
+
         if (isMounted) {
           setRegisteredSchools(schools.sort((a, b) => b.students - a.students));
         }
@@ -246,7 +278,14 @@ const AdminApprovals = () => {
                   {registeredSchools.map((school) => (
                     <tr key={school.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors align-middle">
                       <td className="py-4 px-5">
-                        <p className="font-bold text-slate-900">{school.name}</p>
+                        <p className="font-bold text-slate-900 flex items-center gap-2">
+                          {school.name}
+                          {school.isIndividual && (
+                            <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                              Individual
+                            </span>
+                          )}
+                        </p>
                         <p className="font-mono text-xs text-slate-500 mt-1">UDISE: {school.id}</p>
                       </td>
                       <td className="py-4 px-5">
