@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { FiArrowLeft, FiCheckCircle, FiImage, FiX } from 'react-icons/fi';
+import { FiArrowLeft, FiCheckCircle, FiImage, FiX, FiLock } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, firestore } from '../lib/firebase';
 import { uploadStudentPhoto, generateApplicationNumber } from '../lib/cloudinary';
@@ -35,6 +35,25 @@ const StudentRegistration = () => {
   const [photoError, setPhotoError] = useState('');
   const [submitMessage, setSubmitMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [studentRegistrationsOpen, setStudentRegistrationsOpen] = useState(true);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settingsDoc = await getDoc(doc(firestore, 'settings', 'platformControls'));
+        if (settingsDoc.exists()) {
+          const data = settingsDoc.data();
+          setStudentRegistrationsOpen(data.studentRegistrationsOpen !== false);
+        }
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -168,6 +187,39 @@ const StudentRegistration = () => {
     }
   };
 
+  if (loadingSettings) {
+    return (
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  if (!studentRegistrationsOpen) {
+    return (
+      <main className="relative min-h-screen bg-slate-50 overflow-hidden z-0 flex items-center justify-center">
+        <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-400/10 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-purple-400/10 rounded-full blur-[100px]" />
+        </div>
+        
+        <Link to="/auth" aria-label="Back to account options" className="fixed left-6 top-6 z-50 inline-flex rounded-full p-3 text-slate-700 hover:bg-white hover:text-indigo-700 transition-colors shadow-md bg-white/80 backdrop-blur-md">
+          <FiArrowLeft className="w-5 h-5" />
+        </Link>
+
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-3xl p-10 text-center shadow-lg max-w-lg mx-6 relative z-10">
+          <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-500 shadow-inner">
+            <FiLock className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight">Registrations Closed</h2>
+          <p className="text-slate-600 font-medium leading-relaxed">
+            Individual student registrations for Kaun Banega Einstein 2026 are currently closed. Please check back later or contact your school for more information.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="relative min-h-screen bg-slate-50 overflow-hidden py-24 z-0">
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
@@ -176,7 +228,7 @@ const StudentRegistration = () => {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-6">
-        <Link to="/auth" aria-label="Back to account options" title="Back to account options" className="fixed left-6 top-6 z-50 inline-flex rounded-full p-3 text-slate-700 hover:bg-white hover:text-indigo-700 transition-colors shadow-sm">
+        <Link to="/auth" aria-label="Back to account options" title="Back to account options" className="fixed left-6 top-6 z-50 inline-flex rounded-full p-3 text-slate-700 hover:bg-white hover:text-indigo-700 transition-colors shadow-md bg-white/80 backdrop-blur-md">
           <FiArrowLeft className="w-5 h-5" />
         </Link>
 

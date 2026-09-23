@@ -4,7 +4,9 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
-import AuthSelection from './pages/AuthSelection';
+import MainAuthSelection from './pages/MainAuthSelection';
+import SchoolAuthSelection from './pages/SchoolAuthSelection';
+import StudentAuthSelection from './pages/StudentAuthSelection';
 import SchoolLogin from './pages/SchoolLogin';
 import SchoolRegistration from './pages/SchoolRegisteration';
 import SchoolDashboard from './pages/SchoolDashboard';
@@ -132,7 +134,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/auth" element={<AuthSelection />} />
+        <Route path="/auth" element={<MainAuthSelection />} />
+        <Route path="/auth/school" element={<SchoolAuthSelection />} />
+        <Route path="/auth/student" element={<StudentAuthSelection />} />
         <Route path="/login" element={<SchoolLogin />} />
         <Route path="/register" element={<SchoolRegistration />} />
         <Route path="/student/register" element={<StudentRegistration />} />

@@ -193,7 +193,7 @@ const Navbar = ({ forceDarkText = false }) => {
       >
         <nav
           className={`
-            pointer-events-auto relative flex items-center justify-center lg:justify-between w-full font-manrope border transition-all duration-300 ease-in-out
+            pointer-events-auto relative flex items-center justify-between w-full font-manrope border transition-all duration-300 ease-in-out
             ${isScrolled
               ? 'max-w-6xl px-4 lg:px-7 py-3 rounded-full border-white/30'
               : 'max-w-full px-4 lg:px-6 py-3 rounded-full border-transparent'}
@@ -211,15 +211,15 @@ const Navbar = ({ forceDarkText = false }) => {
           {/* ── Logo & Title ── */}
           <Link
             to="/"
-            className="relative flex items-center justify-center lg:justify-start w-full lg:w-auto cursor-pointer select-none"
+            className="relative flex items-center justify-start cursor-pointer select-none gap-2 sm:gap-3 lg:gap-4 shrink min-w-0 pr-2"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <img
               src={logo}
               alt="Kaun Banega Einstein"
-              className={`absolute left-0 lg:static rounded-full object-cover border-2 border-white/20 shadow-lg shrink-0 transition-all duration-300 ease-in-out ${isScrolled ? 'w-10 h-10 lg:w-12 lg:h-12' : 'w-12 h-12 lg:w-16 lg:h-16'}`}
+              className={`rounded-full object-cover border-2 border-white/20 shadow-lg shrink-0 transition-all duration-300 ease-in-out ${isScrolled ? 'w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12' : 'w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16'}`}
             />
-            <span className={`w-full text-center lg:text-left px-14 lg:px-0 lg:ml-4 font-extrabold tracking-tight lg:tracking-wide leading-tight transition-all duration-300 ease-in-out ${isScrolled ? 'text-lg' : 'text-xl lg:text-2xl'} ${isScrolled || forceDarkText ? 'text-slate-900 drop-shadow-none' : 'text-white drop-shadow-md'}`}>
+            <span className={`font-extrabold tracking-tight lg:tracking-wide leading-tight transition-all duration-300 ease-in-out truncate ${isScrolled ? 'text-sm sm:text-base lg:text-lg' : 'text-base sm:text-lg lg:text-2xl'} ${isScrolled || forceDarkText ? 'text-slate-900 drop-shadow-none' : 'text-white drop-shadow-md'}`}>
               Kaun Banega Einstein
             </span>
           </Link>
@@ -248,11 +248,11 @@ const Navbar = ({ forceDarkText = false }) => {
             })}
           </div>
 
-          {/* ── Right CTA (Desktop Only) ── */}
-          <div className="hidden lg:block shrink-0">
+          {/* ── Right CTA (Mobile & Desktop) ── */}
+          <div className="block shrink-0">
             <Link
               to={isLoggedIn ? dashboardPath : '/auth'}
-              className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-bold text-sm lg:text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105 inline-block"
+              className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 lg:px-6 lg:py-2.5 rounded-full font-bold text-xs sm:text-sm lg:text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105 inline-block whitespace-nowrap"
             >
               {isLoggedIn ? 'Dashboard' : 'Register'}
             </Link>

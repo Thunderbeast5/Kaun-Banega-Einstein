@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
+import loginImage from '../assets/stud.webp';
 import { auth } from '../lib/firebase';
 
 const StudentLogin = () => {
@@ -31,8 +32,9 @@ const StudentLogin = () => {
   };
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center bg-slate-50 overflow-hidden z-0">
+    <main className="relative min-h-screen flex bg-slate-50 overflow-hidden z-0">
       
+      {/* Back Button */}
       <Link 
         to="/auth" 
         aria-label="Back to account options" 
@@ -42,15 +44,30 @@ const StudentLogin = () => {
         <FiArrowLeft className="w-5 h-5" />
       </Link>
 
-      <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-indigo-400/10 rounded-full blur-[100px]" />
+      {/* Left Half: Image */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${loginImage})` }}
+        />
+        {/* Subtle overlay to blend the image tone slightly */}
+        <div className="absolute inset-0 bg-indigo-900/10" />
       </div>
 
-      <div className="w-full max-w-md px-6 py-24 relative z-10">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Student Login</h1>
-          <p className="text-slate-600 font-medium text-base mt-3">Access your individual dashboard</p>
+      {/* Right Half: Form Container */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center relative py-24 px-6 lg:px-16">
+        
+        {/* Ambient Background Blur */}
+        <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-indigo-400/10 rounded-full blur-[100px]" />
         </div>
+
+        {/* Clean Login Form */}
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Student Login</h1>
+            <p className="text-slate-600 font-medium text-base mt-3">Access your individual dashboard</p>
+          </div>
 
         <form className="flex flex-col gap-6" onSubmit={handleLogin}>
           <div className="flex flex-col gap-2">
@@ -82,9 +99,15 @@ const StudentLogin = () => {
           </button>
         </form>
 
+        <div className="flex justify-end items-center px-1">
+          <a href="#" className="text-sm font-bold text-indigo-700 hover:text-indigo-800 transition-colors">Forgot Password?</a>
+        </div>
+
         <p className="text-center mt-12 text-sm text-slate-600 font-medium">
           Not registered yet? <Link to="/student/register" className="text-indigo-700 font-bold hover:underline">Register Here</Link>
         </p>
+      </div>
+
       </div>
     </main>
   );
