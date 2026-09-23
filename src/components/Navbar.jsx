@@ -1,5 +1,5 @@
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiHome, FiLayout, FiTarget, FiAward, FiGift, FiFileText } from 'react-icons/fi';
@@ -44,10 +44,29 @@ const Navbar = ({ forceDarkText = false }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const [dashboardPath, setDashboardPath] = useState('/dashboard');
+
   // Auth state
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsLoggedIn(Boolean(user));
+      if (user) {
+        try {
+          const studentDoc = await getDoc(doc(firestore, 'individual_students', user.uid));
+          if (studentDoc.exists()) {
+            setDashboardPath('/student/dashboard');
+          } else {
+            const adminDoc = await getDoc(doc(firestore, 'admins', user.uid));
+            if (adminDoc.exists()) {
+              setDashboardPath('/admin');
+            } else {
+              setDashboardPath('/dashboard');
+            }
+          }
+        } catch (e) {
+          setDashboardPath('/dashboard');
+        }
+      }
     });
     return unsubscribe;
   }, []);
@@ -232,7 +251,7 @@ const Navbar = ({ forceDarkText = false }) => {
           {/* ── Right CTA (Desktop Only) ── */}
           <div className="hidden lg:block shrink-0">
             <Link
-              to={isLoggedIn ? '/dashboard' : '/auth'}
+              to={isLoggedIn ? dashboardPath : '/auth'}
               className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2.5 rounded-full font-bold text-sm lg:text-base tracking-wide shadow-lg transition-all duration-300 hover:scale-105 inline-block"
             >
               {isLoggedIn ? 'Dashboard' : 'Register'}
