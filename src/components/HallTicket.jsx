@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { FiUser, FiCalendar, FiAlertTriangle, FiPrinter } from 'react-icons/fi';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
@@ -7,22 +7,46 @@ import kawaleLogo from '../assets/kawle.png';
 
 const HallTicket = ({ studentData }) => {
   const ticketRef = useRef(null);
+  const containerRef = useRef(null);
+  const [scale, setScale] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const availableWidth = entry.contentRect.width;
+        // A4 portrait width is ~794px
+        setScale(Math.min(availableWidth / 794, 1));
+      }
+    });
+    
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, []);
+
   const handleDownloadPdf = async () => {
-    if (!ticketRef.current) return;
+    if (!ticketRef.current || isGenerating) return;
     setIsGenerating(true);
 
     try {
+      const printElement = ticketRef.current;
+      const originalTransform = printElement.style.transform;
+      printElement.style.transform = 'none';
+
       // Render the DOM node to a high-res canvas
       const canvas = await html2canvas(ticketRef.current, {
         scale: 3, // higher = sharper PDF, 3 is a good balance of quality vs file size
-        useCORS: true, // needed if kbeLogo or any image is loaded cross-origin
+        useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        windowWidth: ticketRef.current.scrollWidth,
-        windowHeight: ticketRef.current.scrollHeight,
+        windowWidth: 794,
+        windowHeight: 1123,
       });
+
+      printElement.style.transform = originalTransform;
 
       const imgData = canvas.toDataURL('image/png');
 
@@ -50,9 +74,9 @@ const HallTicket = ({ studentData }) => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-slate-100 min-h-screen py-6 font-manrope">
+    <div className="flex flex-col items-center bg-slate-100 min-h-screen py-6 font-manrope w-full">
       {/* Controls */}
-      <div className="mb-6 flex gap-4">
+      <div className="mb-6 flex gap-4 w-full max-w-[794px] justify-center sm:justify-end px-4">
         <button
           onClick={handleDownloadPdf}
           disabled={isGenerating}
@@ -63,11 +87,22 @@ const HallTicket = ({ studentData }) => {
         </button>
       </div>
 
-      {/* A4 Printable Container */}
-      <div
-        ref={ticketRef}
-        className="hall-ticket font-manrope w-[210mm] h-[297mm] bg-white shadow-2xl relative overflow-hidden flex flex-col border border-slate-200 box-border"
-      >
+      {/* Outer Container */}
+      <div ref={containerRef} className="w-full flex justify-center px-4">
+        {/* Bounding Box */}
+        <div 
+          className="relative overflow-hidden shadow-2xl bg-white"
+          style={{ 
+            width: `${794 * scale}px`, 
+            height: `${1123 * scale}px` 
+          }}
+        >
+          {/* A4 Printable Container */}
+          <div
+            ref={ticketRef}
+            className="hall-ticket font-manrope w-[794px] h-[1123px] bg-white relative flex flex-col border border-slate-200 box-border origin-top-left"
+            style={{ transform: `scale(${scale})` }}
+          >
         {/* Decorative Top Border */}
         <div className="h-3 w-full bg-blue-900" />
 
@@ -232,6 +267,8 @@ const HallTicket = ({ studentData }) => {
           <p className="text-yellow-400 text-xs font-bold italic tracking-wide whitespace-nowrap">
             "Think. Question. Discover. Become the next Einstein!"
           </p>
+        </div>
+      </div>
         </div>
       </div>
     </div>

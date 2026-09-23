@@ -94,11 +94,9 @@ const StudentDashboard = () => {
           <div className="absolute bottom-10 left-10 w-[40rem] h-[40rem] bg-purple-400/10 rounded-full blur-[100px]" />
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
           {isPublished ? (
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-              <HallTicket studentData={studentData} />
-            </div>
+            <HallTicket studentData={studentData} />
           ) : (
             <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-10 text-center max-w-2xl mx-auto mt-10">
               <div className="w-20 h-20 bg-indigo-50 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-6">
