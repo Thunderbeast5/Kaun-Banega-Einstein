@@ -12,6 +12,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import Results from './pages/Results'
 import CertificatePortal from './pages/CertificatePortal';
+import StudentRegistration from './pages/StudentRegistration';
+import StudentLogin from './pages/StudentLogin';
+import StudentDashboard from './pages/StudentDashboard';
 import { auth, firestore } from './lib/firebase';
 
 function ProtectedRoute({ children }) {
@@ -61,6 +64,27 @@ function AdminProtectedRoute({ children }) {
   return status === 'authorized' ? children : <Navigate to="/admin/login" replace />;
 }
 
+// Only lets through individual students
+function StudentProtectedRoute({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setIsCheckingAuth(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (isCheckingAuth) {
+    return <div className="min-h-screen bg-slate-50" aria-label="Checking authentication" />;
+  }
+
+  return currentUser ? children : <Navigate to="/student/login" replace />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -69,9 +93,12 @@ export default function App() {
         <Route path="/auth" element={<AuthSelection />} />
         <Route path="/login" element={<SchoolLogin />} />
         <Route path="/register" element={<SchoolRegistration />} />
+        <Route path="/student/register" element={<StudentRegistration />} />
+        <Route path="/student/login" element={<StudentLogin />} />
         <Route path="/results" element={<Results />} />
         <Route path="/certificate" element={<CertificatePortal />} />
         <Route path="/dashboard" element={<ProtectedRoute><SchoolDashboard /></ProtectedRoute>} />
+        <Route path="/student/dashboard" element={<StudentProtectedRoute><StudentDashboard /></StudentProtectedRoute>} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
         <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />

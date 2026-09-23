@@ -4,7 +4,7 @@ import {
   FiZap, FiGlobe, FiRefreshCw, FiAlertCircle, FiDownload,
 } from 'react-icons/fi';
 import {
-  collection, doc, getDocs, getCountFromServer,
+  collection, doc, getDocs, getDoc, setDoc, getCountFromServer,
   orderBy, query, updateDoc,
 } from 'firebase/firestore';
 import { firestore } from '../../lib/firebase';
@@ -62,6 +62,24 @@ const AdminTickets = () => {
           };
         })
       );
+
+      // Add Individual Students as a pseudo-school
+      const indSnap = await getCountFromServer(collection(firestore, 'individual_students'));
+      const indCount = indSnap.data().count || 0;
+      if (indCount > 0) {
+        const settingsDoc = await getDoc(doc(firestore, 'settings', 'individual_controls'));
+        const indPublished = settingsDoc.exists() ? !!settingsDoc.data().hallTicketPublished : false;
+        list.push({
+          id: 'individuals',
+          udise: 'INDIVIDUALS',
+          name: 'Individual Registrations',
+          region: 'Global',
+          count: indCount,
+          published: indPublished,
+          isIndividual: true,
+        });
+      }
+
       setSchools(list.sort((a, b) => b.count - a.count));
     } catch (err) {
       console.error('Failed to load schools:', err);
@@ -93,10 +111,17 @@ const AdminTickets = () => {
 
     try {
       // 1. Fetch students
-      const rosterRef = collection(firestore, 'students', school.udise, 'roster');
-      const q = query(rosterRef, orderBy('registeredAt', 'asc'));
-      const snap = await getDocs(q);
-      const students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      let students = [];
+      if (school.isIndividual) {
+        const indRef = collection(firestore, 'individual_students');
+        const indSnap = await getDocs(query(indRef, orderBy('createdAt', 'asc')));
+        students = indSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } else {
+        const rosterRef = collection(firestore, 'students', school.udise, 'roster');
+        const q = query(rosterRef, orderBy('registeredAt', 'asc'));
+        const snap = await getDocs(q);
+        students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
 
       if (students.length === 0) {
         showToast('error', `No students registered for ${school.name}.`);
@@ -132,10 +157,17 @@ const AdminTickets = () => {
   const handlePublish = async (school) => {
     setPublishingId(school.udise);
     try {
-      await updateDoc(doc(firestore, 'schools', school.id), {
-        hallTicketPublished: true,
-        hallTicketPublishedAt: new Date().toISOString(),
-      });
+      if (school.isIndividual) {
+        await setDoc(doc(firestore, 'settings', 'individual_controls'), {
+          hallTicketPublished: true,
+          hallTicketPublishedAt: new Date().toISOString(),
+        }, { merge: true });
+      } else {
+        await updateDoc(doc(firestore, 'schools', school.id), {
+          hallTicketPublished: true,
+          hallTicketPublishedAt: new Date().toISOString(),
+        });
+      }
       setSchools(prev => prev.map(sc =>
         sc.id === school.id ? { ...sc, published: true } : sc
       ));
@@ -151,9 +183,15 @@ const AdminTickets = () => {
   const handleUnpublish = async (school) => {
     setPublishingId(school.udise);
     try {
-      await updateDoc(doc(firestore, 'schools', school.id), {
-        hallTicketPublished: false,
-      });
+      if (school.isIndividual) {
+        await setDoc(doc(firestore, 'settings', 'individual_controls'), {
+          hallTicketPublished: false,
+        }, { merge: true });
+      } else {
+        await updateDoc(doc(firestore, 'schools', school.id), {
+          hallTicketPublished: false,
+        });
+      }
       setSchools(prev => prev.map(sc =>
         sc.id === school.id ? { ...sc, published: false } : sc
       ));

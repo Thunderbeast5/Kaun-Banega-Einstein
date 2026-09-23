@@ -24,44 +24,94 @@ const AuthSelection = () => {
           </h1>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Login Card */}
-          <Link to="/login" className="group relative rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-blue-200 block text-left">
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
-            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-300/50 rounded-full -z-10 group-hover:scale-110 transition-transform duration-700 ease-out" />
-            
-            <div className="relative z-10 p-10 md:p-12 flex flex-col h-full justify-between min-h-[320px]">
-              <div>
-                <div className="w-16 h-16 rounded-2xl bg-white/80 border border-white flex items-center justify-center mb-8 shadow-sm">
-                  <FiLogIn className="w-8 h-8 text-blue-700" />
+        <div className="flex flex-col gap-12 max-w-5xl mx-auto">
+          {/* Schools Section */}
+          <div>
+            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">For Schools</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Login Card */}
+              <Link to="/login" className="group relative rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-blue-200 block text-left">
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
+                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-300/50 rounded-full -z-10 group-hover:scale-110 transition-transform duration-700 ease-out" />
+                
+                <div className="relative z-10 p-8 md:p-10 flex flex-col h-full justify-between min-h-[280px]">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/80 border border-white flex items-center justify-center mb-6 shadow-sm">
+                      <FiLogIn className="w-7 h-7 text-blue-700" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-3">School Login</h2>
+                    <p className="text-slate-800 font-medium text-sm">Access your school dashboard to manage students and hall tickets.</p>
+                  </div>
+                  <div className="mt-6 flex items-center text-blue-800 font-bold gap-2 group-hover:gap-4 transition-all">
+                    <span>Access Portal</span>
+                    <FiArrowRight className="w-5 h-5" />
+                  </div>
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-4">School Login</h2>
-                <p className="text-slate-800 font-medium">Already registered? Access your school dashboard to manage students, hall tickets, and results.</p>
-              </div>
-              <div className="mt-8 flex items-center text-blue-800 font-bold gap-2 group-hover:gap-4 transition-all">
-                <span>Access Portal</span>
-                <FiArrowRight className="w-5 h-5" />
-              </div>
-            </div>
-          </Link>
+              </Link>
 
-          {/* Register Card */}
-          <Link to="/register" className="group relative rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-blue-400 block text-left hover:-translate-y-2">
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
-            <div className="relative z-10 p-10 md:p-12 flex flex-col h-full justify-between min-h-[320px]">
-              <div>
-                <div className="w-16 h-16 rounded-2xl bg-white/80 border border-white flex items-center justify-center mb-8 shadow-sm">
-                  <FiUserPlus className="w-8 h-8 text-blue-800" />
+              {/* Register Card */}
+              <Link to="/register" className="group relative rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-blue-400 block text-left hover:-translate-y-2">
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
+                <div className="relative z-10 p-8 md:p-10 flex flex-col h-full justify-between min-h-[280px]">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/80 border border-white flex items-center justify-center mb-6 shadow-sm">
+                      <FiUserPlus className="w-7 h-7 text-blue-800" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-3">Register School</h2>
+                    <p className="text-slate-900 font-medium text-sm">Register your institution to allow your students to participate.</p>
+                  </div>
+                  <div className="mt-6 flex items-center text-slate-900 font-bold gap-2 group-hover:gap-4 transition-all">
+                    <span>Start Registration</span>
+                    <FiArrowRight className="w-5 h-5" />
+                  </div>
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-4">Register School</h2>
-                <p className="text-slate-900 font-medium">New to KBE? Register your institution to allow your brilliant young minds to participate.</p>
-              </div>
-              <div className="mt-8 flex items-center text-slate-900 font-bold gap-2 group-hover:gap-4 transition-all">
-                <span>Start Registration</span>
-                <FiArrowRight className="w-5 h-5" />
-              </div>
+              </Link>
             </div>
-          </Link>
+          </div>
+
+          {/* Individual Students Section */}
+          <div>
+            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">For Individual Students</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Student Login Card */}
+              <Link to="/student/login" className="group relative rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-indigo-200 block text-left">
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
+                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-300/50 rounded-full -z-10 group-hover:scale-110 transition-transform duration-700 ease-out" />
+                
+                <div className="relative z-10 p-8 md:p-10 flex flex-col h-full justify-between min-h-[280px]">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/80 border border-white flex items-center justify-center mb-6 shadow-sm">
+                      <FiLogIn className="w-7 h-7 text-indigo-700" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-3">Student Login</h2>
+                    <p className="text-slate-800 font-medium text-sm">Access your personal dashboard to download your hall ticket.</p>
+                  </div>
+                  <div className="mt-6 flex items-center text-indigo-800 font-bold gap-2 group-hover:gap-4 transition-all">
+                    <span>Access Portal</span>
+                    <FiArrowRight className="w-5 h-5" />
+                  </div>
+                </div>
+              </Link>
+
+              {/* Student Register Card */}
+              <Link to="/student/register" className="group relative rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden bg-indigo-400 block text-left hover:-translate-y-2">
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-md z-0" />
+                <div className="relative z-10 p-8 md:p-10 flex flex-col h-full justify-between min-h-[280px]">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/80 border border-white flex items-center justify-center mb-6 shadow-sm">
+                      <FiUserPlus className="w-7 h-7 text-indigo-800" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-3">Student Registration</h2>
+                    <p className="text-slate-900 font-medium text-sm">School not participating? Register individually here.</p>
+                  </div>
+                  <div className="mt-6 flex items-center text-slate-900 font-bold gap-2 group-hover:gap-4 transition-all">
+                    <span>Start Registration</span>
+                    <FiArrowRight className="w-5 h-5" />
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </main>
