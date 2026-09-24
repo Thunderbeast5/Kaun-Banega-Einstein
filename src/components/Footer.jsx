@@ -93,6 +93,7 @@ const Footer = () => {
             <ul className="space-y-3 md:space-y-4 font-medium text-sm">
               {[
                 { label: 'School Login', href: '/login' },
+                { label: 'Student Login', href: '/student/login' },
                 { label: 'Admin Login', href: '/admin/login' },
                 // { label: 'Student Info', href: '#student-info' },
                 // { label: 'Certificate Verification', href: '/certificate' },
