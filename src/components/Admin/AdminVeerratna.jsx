@@ -33,7 +33,7 @@ const AdminVeerratna = () => {
         veerratnaOpen: nextState,
       }, { merge: true });
     } catch (err) {
-      console.error('Failed to toggle Veerratna registration status:', err);
+      console.error('Failed to toggle Vigyan Ratna Puraskar registration status:', err);
       alert('Failed to update registration status. Please try again.');
     } finally {
       setIsTogglingStatus(false);
@@ -55,7 +55,7 @@ const AdminVeerratna = () => {
           setRegistrations(data);
         }
       } catch (err) {
-        console.error('Failed to load Veerratna Award registrations:', err);
+        console.error('Failed to load Vigyan Ratna Puraskar registrations:', err);
         // Fallback without ordering if index not yet generated
         try {
           const fallbackSnap = await getDocs(collection(firestore, 'veerratna'));
@@ -114,9 +114,9 @@ const AdminVeerratna = () => {
 
       const worksheet = XLSX.utils.json_to_sheet(rows);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Veerratna Award');
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Vigyan Ratna Puraskar');
 
-      XLSX.writeFile(workbook, 'Veerratna_Award_Registrations.xlsx');
+      XLSX.writeFile(workbook, 'Vigyan_Ratna_Puraskar_Registrations.xlsx');
     } catch (err) {
       console.error('Failed to export Excel:', err);
       alert('Failed to export Excel file. Please check console for details.');
@@ -149,8 +149,8 @@ const AdminVeerratna = () => {
             <FiAward className="w-3.5 h-3.5" />
             <span>Award Management</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Veerratna Award</h2>
-          <p className="text-slate-600 font-medium">Review and export all coordinator and teacher registrations for the Veerratna Award.</p>
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Vigyan Ratna Puraskar</h2>
+          <p className="text-slate-600 font-medium">Review and export all coordinator and teacher registrations for the Vigyan Ratna Puraskar.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -164,7 +164,7 @@ const AdminVeerratna = () => {
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
                 : 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100'
             }`}
-            title="Click to toggle Veerratna registrations open or closed"
+            title="Click to toggle Vigyan Ratna Puraskar registrations open or closed"
           >
             {isTogglingStatus ? (
               <FiLoader className="w-3.5 h-3.5 animate-spin" />
@@ -285,7 +285,7 @@ const AdminVeerratna = () => {
                     <tr>
                       <td colSpan="5" className="py-16 text-center text-slate-400 font-medium text-sm">
                         {registrations.length === 0
-                          ? 'No Veerratna Award registrations found yet.'
+                          ? 'No Vigyan Ratna Puraskar registrations found yet.'
                           : 'No registrations match your search.'}
                       </td>
                     </tr>
@@ -333,7 +333,7 @@ const AdminVeerratna = () => {
               </div>
               <div>
                 <h3 className="text-2xl font-extrabold text-slate-900">{selectedEntry.coordinatorName}</h3>
-                <p className="text-sm text-slate-500">Veerratna Award Candidate</p>
+                <p className="text-sm text-slate-500">Vigyan Ratna Puraskar Candidate</p>
               </div>
             </div>
 

@@ -94,7 +94,7 @@ const Footer = () => {
               {[
                 { label: 'School Login', href: '/login' },
                 { label: 'Student Login', href: '/student/login' },
-                { label: 'Veerratna Award', href: '/veerratna' },
+                { label: 'Vigyan Ratna Puraskar', href: '/veerratna' },
                 { label: 'Admin Login', href: '/admin/login' },
                 // { label: 'Student Info', href: '#student-info' },
                 // { label: 'Certificate Verification', href: '/certificate' },

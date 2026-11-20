@@ -90,9 +90,9 @@ const AdminControls = () => {
     },
     {
       key: 'veerratnaOpen',
-      label: 'Veerratna Award Registrations',
-      descOn:  'Open — coordinators and teachers can apply for the Veerratna Award.',
-      descOff: 'Closed — Veerratna Award registration form is closed.',
+      label: 'Vigyan Ratna Puraskar Registrations',
+      descOn:  'Open — coordinators and teachers can apply for the Vigyan Ratna Puraskar.',
+      descOff: 'Closed — Vigyan Ratna Puraskar registration form is closed.',
     },
     {
       key: 'resultsVisible',

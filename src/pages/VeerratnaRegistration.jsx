@@ -224,7 +224,7 @@ const VeerratnaRegistration = () => {
             Registrations Closed
           </h1>
           <p className="text-sm sm:text-base text-slate-500 font-medium mb-8 leading-relaxed">
-            Veer Ratna Puraskar registrations are currently closed. Please check back later or contact the KBE team for assistance.
+            Vigyan Ratna Puraskar registrations are currently closed. Please check back later or contact the KBE team for assistance.
           </p>
           <Link
             to="/"
@@ -264,7 +264,7 @@ const VeerratnaRegistration = () => {
               Application Submitted
             </span>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-              Veer Ratna Puraskar 2026
+              Vigyan Ratna Puraskar 2026
             </h1>
             <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed max-w-lg mx-auto mb-6 sm:mb-8">
               Thank you, <span className="font-bold text-slate-900">{submittedData.coordinatorName}</span>. Your nomination has been securely submitted and recorded in the database.
@@ -372,11 +372,10 @@ const VeerratnaRegistration = () => {
           </span>
 
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-3 sm:mb-4">
-            Veer Ratna Puraskar
+            Vigyan Ratna Puraskar
           </h1>
           <p className="text-sm sm:text-base text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            Honoring exceptional coordinators, teachers, and educators for their invaluable contributions to student empowerment.
-          </p>
+Honouring the Science Teachers who inspire innovation, ignite curiosity, and shape the future through the power of science          </p>
         </div>
 
         <form onSubmit={handleRegistration} className="space-y-6 sm:space-y-8">
@@ -450,7 +449,7 @@ const VeerratnaRegistration = () => {
                       name="aboutYourself"
                       required
                       rows="4"
-                      placeholder="Briefly describe your teaching journey, notable accomplishments, student mentorship, and why you are applying for the Veer Ratna Puraskar."
+                      placeholder="Briefly describe your teaching journey, notable accomplishments, student mentorship, and why you are applying for the Vigyan Ratna Puraskar."
                       className="w-full bg-white/60 border border-white rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3 text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white transition-all shadow-sm resize-none font-medium text-sm"
                     />
                   </div>
@@ -549,7 +548,7 @@ const VeerratnaRegistration = () => {
                     required
                   />
                   <span className="text-xs sm:text-sm font-medium text-slate-700 leading-relaxed max-w-xl">
-                    I confirm that the coordinator and school details submitted for the Veer Ratna Puraskar are accurate, and I agree to the{' '}
+                    I confirm that the coordinator and school details submitted for the Vigyan Ratna Puraskar are accurate, and I agree to the{' '}
                     <button
                       type="button"
                       onClick={() => setIsTermsOpen(true)}
@@ -565,7 +564,7 @@ const VeerratnaRegistration = () => {
                   disabled={isSubmitting}
                   className="w-full lg:w-auto px-6 sm:px-10 py-3.5 sm:py-4 rounded-full bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm sm:text-base transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span>{isSubmitting ? 'Submitting Application...' : 'Submit Veer Ratna Application'}</span>
+                  <span>{isSubmitting ? 'Submitting Application...' : 'Submit Vigyan Ratna Application'}</span>
                   {/* <FiCheckCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> */}
                 </button>
               </div>
@@ -589,7 +588,7 @@ const VeerratnaRegistration = () => {
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4 sm:p-6 md:p-8"
           role="dialog"
           aria-modal="true"
-          aria-label="Veer Ratna Puraskar Poster"
+          aria-label="Vigyan Ratna Puraskar Poster"
           onClick={() => setShowPosterModal(false)}
         >
           <div
@@ -609,7 +608,7 @@ const VeerratnaRegistration = () => {
             {/* Poster Image */}
             <img
               src={veerratnaPoster}
-              alt="Veer Ratna Puraskar Announcement Poster"
+              alt="Vigyan Ratna Puraskar Announcement Poster"
               className="w-auto max-w-full max-h-[80dvh] sm:max-h-[84dvh] object-contain rounded-xl sm:rounded-2xl shadow-2xl border border-white/25 bg-white"
             />
           </div>
@@ -638,11 +637,11 @@ const VeerratnaRegistration = () => {
               <FiX className="w-5 h-5" />
             </button>
             <h2 id="terms-title" className="pr-10 text-xl sm:text-2xl font-bold text-slate-900">
-              Veer Ratna Puraskar Terms & Conditions
+              Vigyan Ratna Puraskar Terms & Conditions
             </h2>
             <div className="mt-5 sm:mt-6 space-y-3.5 sm:space-y-4 text-slate-700 leading-relaxed text-xs sm:text-sm">
               <p>
-                1. The Veer Ratna Puraskar is presented to acknowledge educational coordinators and teachers demonstrating extraordinary commitment to learning and student guidance.
+                1. The Vigyan Ratna Puraskar is presented to acknowledge educational coordinators and teachers demonstrating extraordinary commitment to learning and student guidance.
               </p>
               <p>
                 2. Coordinators and teachers are eligible to register individually. Each applicant may register once using their unique email and phone number.

@@ -10,7 +10,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
     { id: 'overview', label: 'Global Overview', icon: <FiGrid className="w-5 h-5" /> },
     { id: 'registrations', label: 'School Registrations', icon: <FiShield className="w-5 h-5" /> },
-    { id: 'veerratna', label: 'Veerratna Award', icon: <FiStar className="w-5 h-5" /> },
+    { id: 'veerratna', label: 'Vigyan Ratna Puraskar', icon: <FiStar className="w-5 h-5" /> },
     { id: 'tickets', label: 'Hall Tickets', icon: <FiFileText className="w-5 h-5" /> },
     { id: 'results', label: 'Results', icon: <FiAward className="w-5 h-5" /> },
     { id: 'broadcast', label: 'Broadcast', icon: <FiRadio className="w-5 h-5" /> },
