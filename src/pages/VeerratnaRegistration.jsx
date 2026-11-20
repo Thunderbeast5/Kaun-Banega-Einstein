@@ -73,15 +73,8 @@ const VeerratnaRegistration = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Strict Duplicate Check across the collection
+      // 1. Duplicate Check across the collection (Unique per applicant - email and mobile)
       const veerratnaCol = collection(firestore, 'veerratna');
-
-      // Check by UDISE
-      const udiseQuery = query(veerratnaCol, where('udiseNumber', '==', cleanUdise));
-      const udiseSnap = await getDocs(udiseQuery);
-      if (!udiseSnap.empty) {
-        throw new Error(`An application for school UDISE ${cleanUdise} has already been registered for the Veerratna Award.`);
-      }
 
       // Check by Coordinator Email
       const emailQuery = query(veerratnaCol, where('coordinatorEmail', '==', cleanEmail));
@@ -97,8 +90,9 @@ const VeerratnaRegistration = () => {
         throw new Error(`An application with coordinator mobile number "${cleanMobile}" has already been submitted.`);
       }
 
-      // 2. Atomic Transaction to write data with deterministic ID (udiseNumber) to prevent race-condition duplicates
-      const veerratnaRef = doc(firestore, 'veerratna', cleanUdise);
+      // 2. Atomic Transaction with unique ID per applicant (sanitized email)
+      const docId = cleanEmail.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const veerratnaRef = doc(firestore, 'veerratna', docId);
 
       const resolvedSchoolName = schoolName || formData.schoolName || schoolByUdise.get(cleanUdise)?.school_name || 'Unknown School';
 
@@ -124,7 +118,7 @@ const VeerratnaRegistration = () => {
       await runTransaction(firestore, async (transaction) => {
         const existingEntry = await transaction.get(veerratnaRef);
         if (existingEntry.exists()) {
-          throw new Error(`An entry for UDISE ${cleanUdise} already exists.`);
+          throw new Error(`An application with email "${cleanEmail}" has already been registered.`);
         }
         transaction.set(veerratnaRef, entryPayload);
       });
@@ -489,7 +483,7 @@ const VeerratnaRegistration = () => {
             <h2 id="terms-title" className="pr-10 text-2xl font-bold text-slate-900">Veerratna Award Terms & Conditions</h2>
             <div className="mt-6 space-y-4 text-slate-700 leading-relaxed text-sm">
               <p>1. The Veerratna Award is presented to acknowledge educational coordinators and teachers demonstrating extraordinary commitment to learning and student guidance.</p>
-              <p>2. Only one nomination per school / coordinator is eligible. Duplicate submissions by email, phone, or school UDISE will not be permitted.</p>
+              <p>2. Coordinators and teachers are eligible to register individually. Each applicant may register once using their unique email and phone number.</p>
               <p>3. Information submitted in this form may be reviewed by the KBE evaluation committee to determine award recipients.</p>
               <p>4. All decisions by the evaluation committee are final and binding.</p>
             </div>
