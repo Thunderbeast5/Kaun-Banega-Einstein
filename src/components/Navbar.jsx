@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiHome, FiLayout, FiTarget, FiAward, FiGift, FiFileText } from 'react-icons/fi';
 import logo from '../assets/KBE.png';
+import instLogo1 from '../assets/kawle.png';
+import instLogo2 from '../assets/logo.png';
 import { auth, firestore } from '../lib/firebase';
 
 const Navbar = ({ forceDarkText = false }) => {
@@ -217,11 +219,63 @@ const Navbar = ({ forceDarkText = false }) => {
             <img
               src={logo}
               alt="Kaun Banega Einstein"
-              className={`rounded-full object-cover border-2 border-white/20 shadow-lg shrink-0 transition-all duration-300 ease-in-out ${isScrolled ? 'w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12' : 'w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16'}`}
+              className={`rounded-full object-cover border-2 border-white/20 shadow-lg shrink-0 transition-all duration-300 ease-in-out ${
+                isScrolled
+                  ? 'w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12'
+                  : 'w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16'
+              }`}
             />
-            <span className={`font-extrabold tracking-tight lg:tracking-wide leading-tight transition-all duration-300 ease-in-out truncate ${isScrolled ? 'text-sm sm:text-base lg:text-lg' : 'text-base sm:text-lg lg:text-2xl'} ${isScrolled || forceDarkText ? 'text-slate-900 drop-shadow-none' : 'text-white drop-shadow-md'}`}>
-              Kaun Banega Einstein
-            </span>
+
+            <div className="flex flex-col justify-center min-w-0">
+              {/* Organized by + Two Logos (No background) */}
+              <div
+                className={`flex items-center gap-1.5 sm:gap-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                  isScrolled
+                    ? 'max-h-0 opacity-0 mb-0'
+                    : 'max-h-8 opacity-100 mb-0.5 sm:mb-1'
+                }`}
+              >
+                <span
+                  className={`text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap ${
+                    forceDarkText ? 'text-slate-600' : 'text-white/85 drop-shadow-sm'
+                  }`}
+                >
+                  Organized by
+                </span>
+                <img
+                  src={instLogo1}
+                  alt="Organizer Institute 1"
+                  className="h-6 sm:h-6 w-auto object-contain drop-shadow-sm"
+                />
+                <span
+                  className={`text-[10px] font-medium ${
+                    forceDarkText ? 'text-slate-500' : 'text-white/75'
+                  }`}
+                >
+                  &amp;
+                </span>
+                <img
+                  src={instLogo2}
+                  alt="Organizer Institute 2"
+                  className="h-4 sm:h-5 w-auto object-contain drop-shadow-sm"
+                />
+              </div>
+
+              {/* Original KBE Title Styling */}
+              <span
+                className={`font-extrabold tracking-tight lg:tracking-wide leading-tight transition-all duration-300 ease-in-out truncate ${
+                  isScrolled
+                    ? 'text-sm sm:text-base lg:text-lg'
+                    : 'text-base sm:text-lg lg:text-2xl'
+                } ${
+                  isScrolled || forceDarkText
+                    ? 'text-slate-900 drop-shadow-none'
+                    : 'text-white drop-shadow-md'
+                }`}
+              >
+                Kaun Banega Einstein
+              </span>
+            </div>
           </Link>
 
           {/* ── Center nav (Desktop Only) ── */}

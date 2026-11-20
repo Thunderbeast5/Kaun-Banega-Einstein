@@ -444,7 +444,6 @@ const VeerratnaRegistration = () => {
                     >
                       Terms & Conditions
                     </button>
-                    .
                   </span>
                 </label>
 
