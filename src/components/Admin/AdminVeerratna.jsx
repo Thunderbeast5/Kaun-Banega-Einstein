@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { FiAward, FiSearch, FiFileText, FiLoader, FiX, FiExternalLink, FiCalendar, FiMapPin, FiMail, FiPhone } from 'react-icons/fi';
+import { collection, doc, getDocs, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
+import { FiAward, FiSearch, FiFileText, FiLoader, FiX, FiExternalLink, FiCalendar, FiMapPin, FiMail, FiPhone, FiCheckCircle } from 'react-icons/fi';
 import * as XLSX from 'xlsx';
 import { firestore } from '../../lib/firebase';
 
@@ -10,6 +10,35 @@ const AdminVeerratna = () => {
   const [search, setSearch] = useState('');
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isVeerratnaOpen, setIsVeerratnaOpen] = useState(true);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+
+  // Live listen to platform controls to know if Veerratna registrations are open
+  useEffect(() => {
+    const unsub = onSnapshot(doc(firestore, 'settings', 'platformControls'), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setIsVeerratnaOpen(data.veerratnaOpen !== false);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const handleToggleVeerratnaStatus = async () => {
+    if (isTogglingStatus) return;
+    setIsTogglingStatus(true);
+    const nextState = !isVeerratnaOpen;
+    try {
+      await setDoc(doc(firestore, 'settings', 'platformControls'), {
+        veerratnaOpen: nextState,
+      }, { merge: true });
+    } catch (err) {
+      console.error('Failed to toggle Veerratna registration status:', err);
+      alert('Failed to update registration status. Please try again.');
+    } finally {
+      setIsTogglingStatus(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -124,7 +153,30 @@ const AdminVeerratna = () => {
           <p className="text-slate-600 font-medium">Review and export all coordinator and teacher registrations for the Veerratna Award.</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Quick Open/Close Status Toggle */}
+          <button
+            type="button"
+            onClick={handleToggleVeerratnaStatus}
+            disabled={isTogglingStatus}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm cursor-pointer border ${
+              isVeerratnaOpen
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                : 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100'
+            }`}
+            title="Click to toggle Veerratna registrations open or closed"
+          >
+            {isTogglingStatus ? (
+              <FiLoader className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <span className={`w-2.5 h-2.5 rounded-full ${isVeerratnaOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+            )}
+            <span>Registrations: {isVeerratnaOpen ? 'Open' : 'Closed'}</span>
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+              ({isVeerratnaOpen ? 'Click to Close' : 'Click to Open'})
+            </span>
+          </button>
+
           <button
             onClick={handleExportExcel}
             disabled={isExporting || registrations.length === 0}

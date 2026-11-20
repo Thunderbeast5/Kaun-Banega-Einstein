@@ -8,6 +8,7 @@ const SETTINGS_DOC = doc(firestore, 'settings', 'platformControls');
 const defaultSettings = {
   registrationsOpen: true,
   studentRegistrationsOpen: true,
+  veerratnaOpen: true,
   resultsVisible: false,
   certificatesVisible: false,
 };
@@ -86,6 +87,12 @@ const AdminControls = () => {
       label: 'Student Registrations',
       descOn:  'Open — registered schools can add students.',
       descOff: 'Closed — adding students is blocked for all schools.',
+    },
+    {
+      key: 'veerratnaOpen',
+      label: 'Veerratna Award Registrations',
+      descOn:  'Open — coordinators and teachers can apply for the Veerratna Award.',
+      descOff: 'Closed — Veerratna Award registration form is closed.',
     },
     {
       key: 'resultsVisible',
