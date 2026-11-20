@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
+import Organizers from '../components/Organizers';
 import About from '../components/About';
 import Structure from '../components/Structure';
 import RocketLaunch from '../components/RocketLaunch';
@@ -12,6 +13,7 @@ const LandingPage = () => {
     <>
       <Navbar />
       <Hero />
+      <Organizers />
       <About />
       <Structure />
       <RocketLaunch />

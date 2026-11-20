@@ -248,12 +248,11 @@ const Navbar = ({ forceDarkText = false }) => {
                   className="h-6 sm:h-6 w-auto object-contain drop-shadow-sm"
                 />
                 <span
-                  className={`text-[10px] font-medium ${
-                    forceDarkText ? 'text-slate-500' : 'text-white/75'
+                  aria-hidden="true"
+                  className={`h-3.5 sm:h-4 w-px ${
+                    forceDarkText ? 'bg-slate-400/70' : 'bg-white/50'
                   }`}
-                >
-                  &amp;
-                </span>
+                />
                 <img
                   src={instLogo2}
                   alt="Organizer Institute 2"
