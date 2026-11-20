@@ -10,6 +10,7 @@ import AdminControls from '../components/Admin/AdminControls';
 import AdminTickets from '../components/Admin/AdminTickets';
 import AdminResults from '../components/Admin/AdminResults';
 import AdminBroadcast from '../components/Admin/AdminBroadcast';
+import AdminVeerratna from '../components/Admin/AdminVeerratna';
 import AdminDashboardSkeleton from '../components/Admin/skeletons/AdminDashboardSkeleton';
 
 const AdminDashboard = () => {
@@ -31,6 +32,8 @@ const AdminDashboard = () => {
         return <AdminOverview setActiveTab={setActiveTab} />;
       case 'registrations':
         return <AdminApprovals />;
+      case 'veerratna':
+        return <AdminVeerratna />;
       case 'controls':
         return <AdminControls />;
     case 'tickets':
@@ -54,7 +57,7 @@ const AdminDashboard = () => {
       {/* Top Header */}
       <AdminHeader />
 
-      <div className="flex-1 flex overflow-hidden relative z-0">
+      <div className="flex-1 flex overflow-hidden relative">
         
         {/* Ambient Background Blurs for Dashboard Body */}
         <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">

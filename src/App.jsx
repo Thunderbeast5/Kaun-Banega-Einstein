@@ -9,6 +9,7 @@ import SchoolAuthSelection from './pages/SchoolAuthSelection';
 import StudentAuthSelection from './pages/StudentAuthSelection';
 import SchoolLogin from './pages/SchoolLogin';
 import SchoolRegistration from './pages/SchoolRegisteration';
+import VeerratnaRegistration from './pages/VeerratnaRegistration';
 import SchoolDashboard from './pages/SchoolDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
@@ -139,6 +140,8 @@ export default function App() {
         <Route path="/auth/student" element={<StudentAuthSelection />} />
         <Route path="/login" element={<SchoolLogin />} />
         <Route path="/register" element={<SchoolRegistration />} />
+        <Route path="/school-registration" element={<SchoolRegistration />} />
+        <Route path="/veerratna" element={<VeerratnaRegistration />} />
         <Route path="/student/register" element={<StudentRegistration />} />
         <Route path="/student/login" element={<StudentLogin />} />
         <Route path="/results" element={<Results />} />
