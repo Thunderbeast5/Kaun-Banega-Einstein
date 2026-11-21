@@ -1,10 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiExternalLink } from 'react-icons/fi';
-import kawleLogo from '../assets/kawle.png';
-import kawleNameLogo from '../assets/bk-k-name.png'; // Replace with your actual name logo image path
-import svicsmLogo from '../assets/logo.png';
-import svicsmNameLogo from '../assets/svi-name.png'; // Replace with your actual name logo image path
+import kawleNameLogo from '../assets/bk-k-name.png';
+import svicsmNameLogo from '../assets/svi-name.png';
 
 const Organizers = () => {
   return (
@@ -44,36 +42,26 @@ const Organizers = () => {
           className="flex flex-col md:flex-row items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-16"
         >
           {/* Organizer 1: B. K. Kawale College */}
-          <div className="flex-1 w-full max-w-xs sm:max-w-sm flex flex-col items-center justify-center text-center group px-2">
-            <img
-              src={kawleLogo}
-              alt="B. K. Kawale College Emblem"
-              className="h-24 sm:h-28 md:h-32 w-auto object-contain mb-3 sm:mb-4 transition-transform duration-300 group-hover:scale-105"
-            />
+          <div className="flex-1 w-full max-w-xs sm:max-w-sm flex items-center justify-center text-center group px-2">
             <img
               src={kawleNameLogo}
               alt="B. K. Kawale Jr. College of Science"
-              className="h-16 sm:h-20 md:h-20 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-20 sm:h-24 md:h-28 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
             />
           </div>
 
           {/* Responsive Divider (Horizontal on Mobile, Vertical on Desktop) */}
           <div
             aria-hidden="true"
-            className="w-32 h-px md:w-px md:h-44 bg-slate-300/90 shrink-0"
+            className="w-32 h-px md:w-px md:h-28 bg-slate-300/90 shrink-0"
           />
 
           {/* Organizer 2: Swami Vivekananda Institute of Commerce, Science & Management */}
-          <div className="flex-1 w-full max-w-xs sm:max-w-sm flex flex-col items-center justify-center text-center group px-2">
-            <img
-              src={svicsmLogo}
-              alt="Swami Vivekananda Institute Emblem"
-              className="h-24 sm:h-28 md:h-32 w-auto object-contain mb-3 sm:mb-4 transition-transform duration-300 group-hover:scale-105"
-            />
+          <div className="flex-1 w-full max-w-xs sm:max-w-sm flex items-center justify-center text-center group px-2">
             <img
               src={svicsmNameLogo}
               alt="Swami Vivekananda Institute of Commerce, Science & Management"
-              className="h-16 sm:h-20 md:h-20 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-20 sm:h-24 md:h-28 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
             />
           </div>
         </motion.div>

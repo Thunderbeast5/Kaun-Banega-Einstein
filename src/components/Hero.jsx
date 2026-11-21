@@ -26,21 +26,21 @@ const Hero = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-2xl"
       >
+        <p className="mb-3 text-lg md:text-xl font-semibold uppercase tracking-wider text-white drop-shadow-md">
+          A centralised competitive exam,
+        </p>
         <h1
-          className="mb-2 text-4xl font-extrabold leading-tight text-white drop-shadow-lg sm:text-5xl md:text-7xl"
+          className="mb-3 text-4xl font-extrabold leading-tight text-white drop-shadow-lg sm:text-5xl md:text-6xl lg:text-7xl"
           style={{ fontFamily: '"Playfair Display", serif' }}
         >
-          Step Into the Cosmos.
+          Where Curiosity Meets Intelligence,
         </h1>
         <h2
-          className="mb-6 text-3xl italic text-white-300 drop-shadow-md sm:text-4xl md:text-5xl"
+          className="mb-10 text-2xl italic text-white drop-shadow-md sm:text-3xl md:text-4xl"
           style={{ fontFamily: '"Playfair Display", serif' }}
         >
-          Master the Art of Science.
+          and Young Minds Rise to Become Tomorrow’s Einsteins!
         </h2>
-        <p className="text-lg md:text-xl text-white-200 mb-10 max-w-xl leading-relaxed drop-shadow-lg">
-          The ultimate competitive platform built for brilliant young minds. Practice real-time scientific challenges, analyze complex theories in seconds, and embark on your journey toward a brighter tomorrow effortlessly.
-        </p>
       </motion.div>
     </main>
   );
