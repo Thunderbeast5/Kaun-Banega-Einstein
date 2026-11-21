@@ -53,9 +53,11 @@ const About = () => {
                   <FiLayout className="w-6 h-6 md:w-8 md:h-8 text-blue-700 flex-shrink-0" />
                   <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">The Platform Overview</h3>
                </div>
-               <p className="text-sm sm:text-base lg:text-lg text-slate-800 leading-relaxed font-medium">
-                 The Kaun Banega Einstein (KBE) platform is a centralized, offline-examination management system designed to cultivate scientific curiosity and practical understanding among students in three key districts: <strong className="font-bold text-slate-900">Niphad, Chandwad, and Dindori</strong>. While examinations are held offline, the entire competition life cycle, from registration to certificate issuance, is powered online.
-               </p>
+               <div className="flex flex-1 items-center">
+                 <p className="text-sm sm:text-base lg:text-lg text-slate-800 leading-relaxed font-medium">
+                   The Kaun Banega Einstein (KBE) platform is a centralized, offline-examination management system designed to cultivate scientific curiosity and practical understanding among students in <strong className="font-bold text-slate-900">Nashik District</strong>. While examinations are held offline, the entire competition life cycle, from registration to certificate issuance, is powered online.
+                 </p>
+               </div>
              </div>
           </motion.div>
 
@@ -68,8 +70,7 @@ const About = () => {
                  <h4 className="text-base md:text-lg font-bold text-slate-900">The Mission</h4>
                </div>
                <p className="text-slate-800 font-medium text-xs sm:text-sm md:text-base leading-relaxed">
-                 Reduce manual administrative burden for organizers and participating schools.
-               </p>
+Our Mission is to Ignite Scientific Curiosity, Nurture Young Innovators, and Inspire the Next Generation of Einsteins.               </p>
              </div>
           </motion.div>
 
@@ -82,8 +83,7 @@ const About = () => {
                  <h4 className="text-base md:text-lg font-bold text-slate-900">Objective</h4>
                </div>
                <p className="text-slate-800 font-medium text-xs sm:text-sm md:text-base leading-relaxed">
-                 Develop students' practical interest in science, physics, and space technology.
-               </p>
+To develop scientific temperament, logical thinking, creativity, and problem-solving abilities among students, inspiring them to explore, innovate, and become future scientists and innovators.               </p>
              </div>
           </motion.div>
 
@@ -98,8 +98,7 @@ const About = () => {
                   <div>
                     <h4 className="text-lg md:text-xl font-bold text-slate-900 mb-1">The Goal</h4>
                     <p className="text-slate-800 font-medium max-w-2xl text-xs sm:text-sm md:text-base">
-                      Provide a unified platform for registration, hall tickets, results, and finalist selection.
-                    </p>
+To create a generation of scientifically curious, innovative, and confident young minds who transform knowledge into discoveries and dreams into reality.                    </p>
                   </div>
                </div>
                <a href="#structure" className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 sm:py-3 rounded-full bg-blue-600 border border-transparent text-white font-semibold hover:bg-blue-700 transition-colors duration-300 whitespace-nowrap text-sm md:text-base shadow-md hover:shadow-lg">

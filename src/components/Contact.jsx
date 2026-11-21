@@ -52,7 +52,7 @@ const Contact = () => {
                
                {/* Phone Link */}
                <a 
-                 href="tel:+911234567890" 
+                 href="tel:+91 82086 65658" 
                  className="flex flex-col items-center text-center gap-3 md:gap-4 group/item hover:-translate-y-1 transition-transform duration-300"
                >
                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/60 border border-white shadow-sm flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover/item:bg-white group-hover/item:shadow-md">
@@ -60,7 +60,7 @@ const Contact = () => {
                  </div>
                  <div>
                    <p className="text-[10px] md:text-xs text-blue-800 font-bold uppercase tracking-wider mb-0.5 md:mb-1">Phone</p>
-                   <p className="text-slate-900 font-semibold text-base lg:text-lg group-hover/item:text-blue-700 transition-colors">+91 12345 67890</p>
+                   <p className="text-slate-900 font-semibold text-base lg:text-lg group-hover/item:text-blue-700 transition-colors">+91 82086 65658</p>
                  </div>
                </a>
 
@@ -82,7 +82,7 @@ const Contact = () => {
 
                {/* Location Link */}
                <a 
-                 href="https://www.google.com/maps?ll=20.169319,73.991049&z=17&t=m&hl=en-US&gl=US&mapclient=embed&q=20%C2%B010%2709.6%22N+73%C2%B059%2727.8%22E+20.169319,+73.991049@20.1693189,73.9910487"
+                 href="https://www.google.com/maps/place/Swami+Vivekananda+Junior+Inst.+of+Commerce+%26+Science/@20.1693239,73.9884738,17z/data=!3m1!4b1!4m6!3m5!1s0x3bdddb1eda90f145:0x9ea9cb1fb615eed9!8m2!3d20.1693189!4d73.9910487!16s%2Fg%2F11nh4kr_my?entry=ttu&g_ep=EgoyMDI2MDIwMS4wIKXMDSoASAFQAw%3D%3D"
                  target="_blank"
                  rel="noopener noreferrer"
                  className="flex flex-col items-center text-center gap-3 md:gap-4 group/item hover:-translate-y-1 transition-transform duration-300 sm:col-span-2 md:col-span-1 md:delay-150"
@@ -93,7 +93,10 @@ const Contact = () => {
                  <div>
                    <p className="text-[10px] md:text-xs text-blue-800 font-bold uppercase tracking-wider mb-0.5 md:mb-1">Office</p>
                    <p className="text-slate-900 font-semibold text-base lg:text-lg group-hover/item:text-blue-700 transition-colors">
-                     Pimpalgaon B, Nashik MH
+                     Swami Vivekananda Institute,<br />
+                     Near Post Office (SBI Bank),<br />
+                     Pimpalgaon B. Nashik.<br />
+                     Maharashtra
                    </p>
                  </div>
                </a>
