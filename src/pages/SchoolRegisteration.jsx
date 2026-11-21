@@ -4,6 +4,8 @@ import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore
 import { FiArrowLeft, FiCheckCircle, FiX, FiLock } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import schools from '../../data/schools.json';
+import kbePoster from '../assets/kbe-poster-1.webp';
+import PosterModal from '../components/PosterModal';
 import { auth, firestore } from '../lib/firebase';
 
 const schoolByUdise = new Map(schools.map((school) => [school.udise_code, school]));
@@ -127,6 +129,7 @@ const SchoolRegistration = () => {
   if (!registrationsOpen) {
     return (
       <main className="relative min-h-screen bg-slate-50 overflow-hidden flex items-center justify-center px-6">
+        <PosterModal image={kbePoster} alt="Kaun Banega Einstein announcement poster" />
         <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
           <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-blue-400/10 rounded-full blur-[100px]" />
           <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-cyan-400/10 rounded-full blur-[100px]" />
@@ -152,6 +155,7 @@ const SchoolRegistration = () => {
 
   return (
     <main className="relative min-h-screen bg-slate-50 overflow-hidden py-24 z-0">
+      <PosterModal image={kbePoster} alt="Kaun Banega Einstein announcement poster" />
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-blue-400/10 rounded-full blur-[100px]" />
         <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-cyan-400/10 rounded-full blur-[100px]" />

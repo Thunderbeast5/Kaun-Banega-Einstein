@@ -3,6 +3,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import loginImage from '../assets/stud.webp';
+import kbePoster from '../assets/kbe-poster-1.webp';
+import PosterModal from '../components/PosterModal';
 import { auth } from '../lib/firebase';
 
 const StudentLogin = () => {
@@ -33,6 +35,7 @@ const StudentLogin = () => {
 
   return (
     <main className="relative min-h-screen flex bg-slate-50 overflow-hidden z-0">
+      <PosterModal image={kbePoster} alt="Kaun Banega Einstein announcement poster" />
       
       {/* Back Button */}
       <Link 
