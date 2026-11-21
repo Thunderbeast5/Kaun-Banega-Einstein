@@ -97,7 +97,7 @@ const AdminControls = () => {
     {
       key: 'resultsVisible',
       label: 'Results',
-      descOn:  'Visible — Results link appears in navbar (replaces Rocket Launch).',
+      descOn:  'Visible — Results link appears in navbar.',
       descOff: 'Hidden — Results page is not accessible.',
     },
     {
@@ -115,7 +115,7 @@ const AdminControls = () => {
         <p className="text-slate-600 font-medium">Toggle examination phases. Changes apply instantly across the platform.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="max-w-3xl">
 
         {/* ── Lifecycle Toggles ─────────────────────────────── */}
         <div className="relative rounded-[2rem] border border-white/60 shadow-sm bg-blue-100 overflow-hidden">
@@ -156,22 +156,6 @@ const AdminControls = () => {
                 ))}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* ── Rocket Launch Module ──────────────────────────── */}
-        <div className="relative rounded-[2rem] border border-white/60 shadow-sm bg-blue-700 overflow-hidden">
-          <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-600 rounded-full blur-2xl z-0" />
-          <div className="relative z-10 p-8 flex flex-col h-full justify-between">
-            <div>
-              <h3 className="text-2xl font-extrabold text-white mb-2">Rocket Launch Module</h3>
-              <p className="text-blue-100 font-medium leading-relaxed mb-6 text-sm">
-                Manage separate registrations and input physical evaluation scores for the specialized practical event.
-              </p>
-            </div>
-            <button className="w-full py-4 rounded-xl bg-white text-blue-800 font-bold hover:bg-blue-50 transition-colors shadow-md">
-              Launch Module Portal
-            </button>
           </div>
         </div>
 

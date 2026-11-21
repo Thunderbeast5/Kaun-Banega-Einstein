@@ -2,7 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiHome, FiLayout, FiTarget, FiAward, FiGift, FiFileText } from 'react-icons/fi';
+import { FiHome, FiBookOpen, FiAward, FiGift, FiFileText } from 'react-icons/fi';
 import logo from '../assets/KBE.png';
 import instLogo1 from '../assets/kawle.png';
 import instLogo2 from '../assets/logo.png';
@@ -96,9 +96,8 @@ const Navbar = ({ forceDarkText = false }) => {
 
     const sectionTabs = [
       ['about', 'about'],
-      ['structure', 'structure'],
+      ['syllabus', 'syllabus'],
       ['prizes', 'isro-prize'],
-      ...(!resultsVisible ? [['rocket', 'rocket-launch']] : []),
     ];
     const visibleSections = new Map();
     const observer = new IntersectionObserver(
@@ -131,25 +130,23 @@ const Navbar = ({ forceDarkText = false }) => {
   // Dynamically build center navigation links for Desktop
   const navLinks = [
     { path: '#about', label: 'About' },
-    { path: '#structure', label: 'Structure' },
-    resultsVisible
-      ? { path: '/results', label: 'Results' }
-      : { path: '#rocket-launch', label: 'Rocket Launch' },
+    { path: '#syllabus', label: 'Syllabus' },
     { path: '#isro-prize', label: 'Prizes' },
-    certificatesVisible
-      ? { path: '/certificate', label: 'Certificates' }
-      : { path: '#contact', label: 'Contact' },
+    ...(resultsVisible ? [{ path: '/results', label: 'Results' }] : []),
+    ...(certificatesVisible ? [{ path: '/certificate', label: 'Certificates' }] : []),
+    { path: '#contact', label: 'Contact' },
   ];
 
   // Dynamically build mobile/tablet bottom nav links without Auth
   const mobileNavLinks = [
     { id: 'about', path: '/', label: 'Home', icon: FiHome },
-    { id: 'structure', path: '#structure', label: 'Structure', icon: FiLayout },
-    resultsVisible
-      ? { id: 'results', path: '/results', label: 'Results', icon: FiAward }
-      : { id: 'rocket', path: '#rocket-launch', label: 'Rocket', icon: FiTarget },
+    { id: 'syllabus', path: '#syllabus', label: 'Syllabus', icon: FiBookOpen },
     { id: 'prizes', path: '#isro-prize', label: 'Prizes', icon: FiGift },
   ];
+
+  if (resultsVisible) {
+    mobileNavLinks.push({ id: 'results', path: '/results', label: 'Results', icon: FiAward });
+  }
 
   // Conditionally add Certificates to mobile/tablet nav if active
   if (certificatesVisible) {

@@ -45,8 +45,8 @@ const DashboardSchedule = ({ loading: externalLoading }) => {
     {
       date: 'Dec 10, 2026',
       status: 'pending',
-      title: 'Final Level & Rocket Launch',
-      description: 'Centralized practical and written finals. Ultimate winners selected for the ISRO trip.',
+      title: 'Final Level & Grand Prize Ceremony',
+      description: 'Centralized grand finale examination. Ultimate winners selected for the ISRO educational visit.',
     }
   ];
 

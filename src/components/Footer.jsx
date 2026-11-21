@@ -75,7 +75,7 @@ const Footer = () => {
               Competition Info
             </h6>
             <ul className="space-y-3 md:space-y-4 font-medium text-sm">
-              {['About', 'Structure', 'Rocket Launch', 'Contact'].map((link) => (
+              {['About', 'Syllabus', 'Prizes', 'Contact'].map((link) => (
                 <li key={link}>
                   <a href={`#${link.toLowerCase().replace(' ', '-')}`} className="text-slate-600 hover:text-blue-700 md:hover:translate-x-1 transition-transform inline-block">
                     {link}

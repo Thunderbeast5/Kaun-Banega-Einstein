@@ -101,8 +101,8 @@ To develop scientific temperament, logical thinking, creativity, and problem-sol
 To create a generation of scientifically curious, innovative, and confident young minds who transform knowledge into discoveries and dreams into reality.                    </p>
                   </div>
                </div>
-               <a href="#structure" className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 sm:py-3 rounded-full bg-blue-600 border border-transparent text-white font-semibold hover:bg-blue-700 transition-colors duration-300 whitespace-nowrap text-sm md:text-base shadow-md hover:shadow-lg">
-                  Explore Structure
+               <a href="#syllabus" className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 sm:py-3 rounded-full bg-blue-600 border border-transparent text-white font-semibold hover:bg-blue-700 transition-colors duration-300 whitespace-nowrap text-sm md:text-base shadow-md hover:shadow-lg">
+                  Explore Syllabus
                </a>
              </div>
           </motion.div>
